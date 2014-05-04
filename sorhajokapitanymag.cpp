@@ -95,15 +95,20 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	bool Decode() {
-		if (getFetchCount(IR.read().range(7,0)) > current_fetch)
+		if (getFetchCount(IR.range(7,0).to_uint()) > current_fetch){
 			PC++;
 			current_fetch++;
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 	
 	void Execute() {
+	}
+	
+	void getFetchCount(unsigned int op){
+		return 1;
 	}
 	
   //-----------------------------------------------------------------------------------------------
