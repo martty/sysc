@@ -129,33 +129,38 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
+		sc_uint<8> M, t;
 		switch (opcode){
 			case inst_adc_abs:
-				sc_uint<8> M = RAM[op2<<8 + op1];
-				sc_uint<8> t = C.to_bool() ? A + M + 1 :  A + M ;
+				M = RAM[op2<<8 + op1];
+				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
 				Z = (t==0);
-				if (D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_uint();
+				if (D.to_bool()){
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_char();
 					C = (t>99);
-				else
+					}
+				else{
 					C = (t>255);
 					A = t & 0xFF  ;
+					}
 				return;
 				
 			case inst_adc_imm:
-				sc_uint<8> M = RAM[PC.range(15:0)<<8 + op1];
-				sc_uint<8> t = C.to_bool() ? A + M + 1 :  A + M ;
+				M = RAM[PC.range(15,0)<<8 + op1];
+				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
 				Z = (t==0);
-				if (D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_uint();
+				if (D.to_bool()){
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_char();
 					C = (t>99);
-				else
+					}
+				else{
 					C = (t>255);
 					A = t & 0xFF  ;
+					}
 				return;
 				
 			case inst_brk_:
