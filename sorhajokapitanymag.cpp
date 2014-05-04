@@ -24,18 +24,17 @@ struct SorhajoKapitany: public sc_module {
 
   
   //-----------------------------------------------------------------------------------------------
-  void FunctionThread() {
-    while (1) {
-      if (Reset.read() == "1") {
-        // reset all internal variables
-		PC = 0;
-        P = 0;
-      }
-      else {
-		
-		wait();
-    }
-  }
+	void FunctionThread() {
+		while (1) {
+			if (Reset.read() == "1") {
+			// reset all internal variables
+				PC = 0;
+				P = 0;
+			} else {
+				wait();
+			}
+		}
+	}
   //-----------------------------------------------------------------------------------------------
   // contructor ------------------------
   SC_CTOR(SorhajoKapitany) {

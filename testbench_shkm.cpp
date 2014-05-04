@@ -1,4 +1,5 @@
 #include <systemc.h>
+#include "matroz.cpp"
 #include "sorhajokapitanymag.cpp"
 //-------------------------------------------------------------------------------------------------
 int sc_main(int argc, char* argv[]){
