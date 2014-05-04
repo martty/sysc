@@ -177,13 +177,49 @@ struct SorhajoKapitany: public sc_module {
 				PC = h|l;
 				return;	
 			
+			case inst_dex_imp:
+				X--;
+				Z = X==0;
+				N = X[7].to_bool();
+				return;
 			
-				static const unsigned inst_dey_imp = 0x88;
-	static const unsigned inst_inx_imp = 0xe8;
-	static const unsigned inst_iny_imp = 0xc8;
-	static const unsigned inst_inc_abs = 0xee;
-	static const unsigned inst_jmp_abs = 0x4c;
-	static const unsigned inst_jsr_abs = 0x20;
+			case inst_dey_imp:
+				Y--;
+				Z = Y==0;
+				N = Y[7].to_bool();
+				return;
+				
+			case inst_inx_imp:
+				X++;
+				Z = X==0;
+				N = X[7].to_bool();
+				return;
+	
+			case inst_iny_imp:
+				Y++;
+				Z = Y==0;
+				N = Y[7].to_bool();
+				return;
+	
+			case inst_inc_abs:
+				RAM[(op2 << 8)+op1]++;
+				N = RAM[(op2 << 8)+op1][7].to_bool();
+				Z = RAM[(op2 << 8)+op1].to_uint() == 0;
+				return;
+	
+			case inst_jmp_abs:
+				PC = (op2 << 8) + op1;
+				return;
+	
+			case inst_jsr_abs:
+				t = PC-1;
+				RAM[SP] = t.range(7,4);
+				SP--;
+				RAM[SP] = t.range(3,0);
+				SP--;
+				PC = (op2 << 8) + op1;
+				return;
+	
 			case inst_rts_imp:
 				SP++;
 				l = RAM[SP];
