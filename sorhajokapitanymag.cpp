@@ -132,8 +132,10 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int op2 = IR.range(23, 16).to_uint();
 
 		sc_uint<8> M, t, l, h;
-		sc_int<8> REL;
+		int REL;
 
+		bool temp;
+		
 		switch (opcode){
 			case inst_adc_abs:
 				M = RAM[(op2<<8) + op1];
@@ -179,7 +181,6 @@ struct SorhajoKapitany: public sc_module {
 				h = RAM[0xFFFF]<<8;
 				PC = h|l;
 				return;	
-			
 
 			case inst_clc_imp:
 				C = 0 ;
@@ -209,24 +210,24 @@ struct SorhajoKapitany: public sc_module {
 				C = M[7].to_bool();
 				M = (M << 1) & 0xFE;
 				N = M[7].to_bool();
-				Z = (B==0);
+				Z = (M==0);
 				return;
 			
 			case inst_rol_a:
-				sc_uint temp = A[7];
+				temp = A[7].to_bool();
 				A = (A << 1) & 0xFE;
 				A = A | C;
-				C = temp.to_bool();
+				C = temp;
 				Z = (A==0);
 				N = A[7];    
 				return;
 				
 			case inst_rol_abs:
 				M = RAM[(op2<<8) + op1];
-				sc_uint temp = A[7];
+				temp = A[7].to_bool();
 				M = (M << 1) & 0xFE;
 				M = M | C;
-				C = temp.to_bool();
+				C = temp;
 				Z = (A==0);
 				N = A[7]; 
 				RAM[(op2<<8) + op1] = M;
@@ -243,11 +244,11 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_beq_rel:
-				REL = IR.range(15, 8);
+				REL = IR.range(15, 8).to_int();
 				if (Z == 1)  PC = PC + REL;
 				return;
 			case inst_bne_rel:
-				REL = IR.range(15, 8);
+				REL = IR.range(15, 8).to_int();
 				if (Z == 0)  PC = PC + REL;
 				return;
 			case inst_cmp_imm:
