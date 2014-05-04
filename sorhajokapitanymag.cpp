@@ -119,6 +119,14 @@ struct SorhajoKapitany: public sc_module {
 	
 	void Execute() {
 		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8, 0).to_uint() << "@" << PC.to_uint() << std::endl;
+		unsigned int opcode = IR.range(7, 0).to_uint();
+		unsigned int op1 = IR.range(15, 8).to_uint();
+		unsigned int op2 = IR.range(23, 16).to_uint();
+		switch (opcode){
+		
+		
+		};
+		
 		PC++;
 	}
 	
