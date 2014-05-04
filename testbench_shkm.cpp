@@ -60,6 +60,17 @@ int sc_main(int argc, char* argv[]){
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
   
+  
+  sc_trace_file *tf;
+  tf = sc_create_vcd_trace_file("trace");
+  sc_trace(tf,SYSTEM.Reset,"Reset");
+  sc_trace(tf,SYSTEM.Abort,"Abort");
+  sc_trace(tf,SYSTEM.readneg,"RNEG");
+  sc_trace(tf,SYSTEM.writeneg,"WNEG");
+  sc_trace(tf,SYSTEM.Data,"Data");
+  sc_trace(tf,SYSTEM.Address,"Address");
+  sc_trace(tf,DAFT.csneg,"CSNEG_DAFT");
+  sc_trace(tf,gk.csneg,"CSNEG_DAFT");
 	
   
 	std::cin.get();
@@ -87,7 +98,7 @@ int sc_main(int argc, char* argv[]){
 		fclose(f);
 	}
   
-	while(true){
+	for(int i = 0; i < 10000; i++){
 		sc_start(1,SC_NS);
 		if(Abort.read() == "1"){
 			break;
@@ -95,6 +106,7 @@ int sc_main(int argc, char* argv[]){
 	}
   
   std::cout << "Execution finished." << std::endl;
+   sc_close_vcd_trace_file(tf);
 	//---------------------------------------------
   return 0;
 }
