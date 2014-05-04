@@ -38,17 +38,19 @@ int sc_main(int argc, char* argv[]){
 		fseek(f, 0, SEEK_SET);
 
 		unsigned long start = strtoul(argv[2], NULL, 16);
+		std::cout << "Loaded " << std::hex << fsize << " bytes at " << std::hex << start << std::endl;
 		fread(SYSTEM.RAM + start, fsize, 1, f);
 		fclose(f);
 	}
   
+	std::cin.get();
   
 	Reset.write("1");
 	sc_start(340,SC_NS);
 	Reset.write("0");
   
 	while(true){
-		sc_start(10,SC_NS);
+		sc_start(1,SC_NS);
 		if(Abort.read() == "1"){
 			break;
 		}

@@ -88,23 +88,23 @@ struct SorhajoKapitany: public sc_module {
 		while (1) {
 			if (Reset.read() == "1") {
 			// reset all internal variables
-				PC = 0;
+				PC = 0xC000;
 				P = 0;
+				IR = 0;
 			} else {
-
-				current_fetch = 0;
+				current_fetch = 1;
 				do {
 					Fetch();
 				} while (Decode());
 				Execute();
 			}
+			wait();
 		}
-		wait();
 	}
 	
 	void Fetch() {
-		IR.range(current_fetch*8+7, current_fetch*8) = RAM[PC];
-		std::cerr << "Fetched " << IR.range(current_fetch*8+7, current_fetch*8).to_uint() << std::endl;
+		IR.range((current_fetch-1)*8+7, (current_fetch-1)*8) = RAM[PC];
+		std::cerr << "Fetched " << std::hex << IR.range(current_fetch*8+7, current_fetch*8).to_uint() << std::endl;
 	}
 	
 	bool Decode() {
@@ -118,7 +118,12 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	void Execute() {
+<<<<<<< HEAD
 	
+=======
+		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8, 0).to_uint() << "@" << PC.to_uint() << std::endl;
+		PC++;
+>>>>>>> ca5775a33430309578bc4946b43bc2d87617dd5c
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
