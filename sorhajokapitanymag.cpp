@@ -219,7 +219,7 @@ struct SorhajoKapitany: public sc_module {
 				A = A | C.to_char();
 				C = temp;
 				Z = (A==0);
-				N = A[7];    
+				N = A[7].to_bool();    
 				return;
 				
 			case inst_rol_abs:
