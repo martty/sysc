@@ -132,12 +132,12 @@ struct SorhajoKapitany: public sc_module {
 		switch (opcode){
 			case inst_adc_abs:
 				sc_uint<8> M = RAM[op2<<8 + op1];
-				sc_uint<8> t = A.to_uint() + M + C;
+				sc_uint<8> t = A.to_uint() + M + C.to_uint();
 				V = (A[7]!=t[7]) ? 1:0;
 				N = A[7];
 				Z = (t==0) ? 1:0;
 				if (D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C;
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_uint();
 					C = (t>99) ? 1:0;
 				else
 					C = (t>255) ? 1:0;
@@ -146,12 +146,12 @@ struct SorhajoKapitany: public sc_module {
 				
 			case inst_adc_imm:
 				sc_uint<8> M = RAM[PC.range(15:0)<<8 + op1];
-				sc_uint<8> t = A.to_uint() + M + C;
+				sc_uint<8> t = A.to_uint() + M + C.to_uint();
 				V = (A[7]!=t[7]) ? 1:0;
 				N = A[7];
 				Z = (t==0) ? 1:0;
 				if (D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C;
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_uint();
 					C = (t>99) ? 1:0;
 				else
 					C = (t>255) ? 1:0;
