@@ -150,17 +150,20 @@ struct SorhajoKapitany: public sc_module {
 				V = (A[7]!=t[7]) ? 1:0;
 				N = A[7];
 				Z = (t==0) ? 1:0;
-				if (D)
+				if (D){
 					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_uint();
 					C = (t>99) ? 1:0;
-				else
+					}
+				else{
 					C = (t>255) ? 1:0;
 					A = t & 0xFF  ;
+					}
 				return;
 				
-			case inst_brk:
+			case inst_brk_:
+				uint<8> l,h;
 				PC = PC + 1;
-				RAM [SP] = PC.range(15:8);
+				RAM [SP] = PC.range(15,8);
 				SP = SP - 1;
 				RAM [SP] = PC.range(7:0);
 				SP = SP - 1;
