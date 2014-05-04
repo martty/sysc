@@ -24,6 +24,7 @@ int sc_main(int argc, char* argv[]){
 	sc_signal < sc_lv<1> >	Abort;
 	
 	sc_signal < sc_lv<16> > Address;
+	sc_signal < sc_lv<12> > addrout;
 	sc_signal < sc_lv<8> > Data;
 	sc_signal < bool >	readneg;
 	sc_signal < bool >	writeneg;
@@ -51,10 +52,10 @@ int sc_main(int argc, char* argv[]){
 	cd(Address, csnegdaft);
 	
 	CSneg_SysCVideo cs("csnegsyscv");
-	cs(Address, csnegsyscv);
+	cs(Address, csnegsyscv, addrout);
 	
 	SysCVideo gk("gk");
-    gk(Address.range(11,0), Data, readneg, writeneg, csnegsyscv);
+    gk(addrout, Data, readneg, writeneg, csnegsyscv);
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
   
