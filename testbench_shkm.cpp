@@ -39,7 +39,7 @@ int sc_main(int argc, char* argv[]){
 
 		unsigned long start = strtoul(argv[2], NULL, 16);
 		std::cout << "Loaded " << std::hex << fsize << " bytes at " << std::hex << start << std::endl;
-		for (unsigned int = 0; i < fsize; i++){
+		for (unsigned int i = 0; i < fsize; i++){
 			unsigned int tmp = 0;
 			fread(&tmp, fsize, 1, f);
 			SYSTEM.RAM[start + i] = tmp;
