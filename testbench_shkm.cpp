@@ -49,7 +49,7 @@ int sc_main(int argc, char* argv[]){
   
 	while(true){
 		sc_start(10,SC_NS);
-		if(Abort.read() = "1"){
+		if(Abort.read() == "1"){
 			break;
 		}
 	}
