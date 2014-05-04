@@ -49,7 +49,7 @@
 	static const unsigned inst_txa_imp = 0x8a;
 	static const unsigned inst_tya_imp = 0x98;
 	
-int inst_type[39]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txy_imp, inst_tya_imp,
+int inst_type[39]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
 					inst_asl_a, inst_rol_a,
 					inst_adc_imm, inst_and_imm, inst_com_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
 					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bsc_rel,
@@ -57,7 +57,7 @@ int inst_type[39]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst
 					inst_sty_abs, inst_sty_abs,
 					inst_lda_x, inst_sta_x
 					};
-//	0-11: 1
+//	0-12: 1
 //	13-20: 2
 //	21-24: 2
 //	25-38: 3
