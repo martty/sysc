@@ -5,26 +5,26 @@
 //-------------------------------------------------------------------------------------------------
 struct DaftPunk: public sc_module {
 	// ports --------------------------------------
-	sc_in 		< bool >      Clk;
 	sc_in		< sc_lv<16> >	Address;
-	sc_in		< sc_lv<1> >  RWneg;
+	sc_in<bool> readneg;
+    sc_in<bool> writeneg;
 	sc_inout	< sc_lv<8> >  Data;
 	
 	sc_uint<8> RAM[0x10000];
 	// constructor --------------------------------
 	SC_CTOR(DaftPunk){
 		SC_THREAD(FunctionThread);
-		sensitive << Clk.neg();
+		sensitive << readneg << writeneg;
 		// Program memory initialization --
 		//---------------------------------
 	}
 	// function thread ----------------------------
 	void FunctionThread(){
 		while (1){
-			if ( RWneg.read() == "0" ) { 
+			if ( writeneg.read() == 0 ) { 
 				RAM[Address.read().to_uint()] = Data.read(); 
 			}
-			else if ( RWneg.read() == "1" ) { 
+			else if ( readneg.read() == 0 ) { 
 				Data.write( RAM[Address.read().to_uint()] ); 
 			}
 			wait();

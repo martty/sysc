@@ -124,6 +124,20 @@ struct SorhajoKapitany: public sc_module {
 		}
 	}
 	
+	unsigned int get(unsigned int addr){
+		Address.write((op2<<8) + op1);
+		writeneg.write(1);
+		readneg.write(0);
+		return sc_uint<8>(Data.read().to_uint());
+	}
+	
+	void set(unsigned int addr, unsigned int value){
+		Address.write((op2<<8) + op1);
+		Data.write(value);
+		writeneg.write(0);
+		readneg.write(1);
+	}
+	
 	void Execute() {
 		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8+7, 0).to_uint() << "@" << PC.to_uint() << std::endl;
 		unsigned int opcode = IR.range(7, 0).to_uint();
@@ -137,7 +151,8 @@ struct SorhajoKapitany: public sc_module {
 		
 		switch (opcode){
 			case inst_adc_abs:
-				Address.write((op2<<8) + op1);
+				M = get((op2<<8) + op1);
+				
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
@@ -153,7 +168,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 				
 			case inst_adc_imm:
-				M = RAM[(PC.range(15,0)<<8) + op1];
+				M = get((PC.range(15,0)<<8) + op1);
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
@@ -170,14 +185,14 @@ struct SorhajoKapitany: public sc_module {
 	
 			case inst_brk_imp:
 				PC = PC + 1;
-				RAM [SP] = PC.range(15,8);
+				set(SP, PC.range(15,8));
 				SP = SP - 1;
-				RAM [SP] = PC.range(7,0);
+				set(SP, PC.range(7,0));
 				SP = SP - 1;
-				RAM [SP] = P.to_uint()|0x10;
+				set(SP, P.to_uint()|0x10);
 				SP = SP - 1;
-				l = RAM[0xFFFE];
-				h = RAM[0xFFFF]<<8;
+				l = get(0xFFFE);
+				h = get(0xFFFF)<<8;
 				PC = h|l;
 				return;	
 			
@@ -218,7 +233,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 				
 			case inst_asl_abs:
-				M = RAM[(op2<<8) + op1];
+				M = get((op2<<8) + op1);
 				C = M[7].to_bool();
 				M = (M << 1) & 0xFE;
 				N = M[7].to_bool();
@@ -235,14 +250,14 @@ struct SorhajoKapitany: public sc_module {
 				return;
 				
 			case inst_rol_abs:
-				M = RAM[(op2<<8) + op1];
+				M = get((op2<<8) + op1);
 				temp = A[7].to_bool();
 				M = (M << 1) & 0xFE;
 				M = M | C.to_char();
 				C = temp;
 				Z = (A==0);
 				N = A[7].to_bool(); 
-				RAM[(op2<<8) + op1] = M;
+				set((op2<<8) + op1, M);
 				return;
 				
 			case inst_bcc_rel:
@@ -259,10 +274,12 @@ struct SorhajoKapitany: public sc_module {
 				REL = IR.range(15, 8).to_int();
 				if (Z == 1)  PC = PC + REL;
 				return;
+				
 			case inst_bne_rel:
 				REL = IR.range(15, 8).to_int();
 				if (Z == 0)  PC = PC + REL;
 				return;
+				
 			case inst_cmp_imm:
 				t = op1 - A;
 				N = t[7].to_bool();
@@ -294,9 +311,10 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_inc_abs:
-				RAM[(op2 << 8)+op1]++;
-				N = RAM[(op2 << 8)+op1][7].to_bool();
-				Z = RAM[(op2 << 8)+op1].to_uint() == 0;
+				M = get((op2 << 8)+op1)++;
+				set((op2 << 8)+op1, M);
+				N = M[7].to_bool();
+				Z = M.to_uint() == 0;
 				return;
 	
 			case inst_jmp_abs:
@@ -305,18 +323,18 @@ struct SorhajoKapitany: public sc_module {
 	
 			case inst_jsr_abs:
 				t = PC-1;
-				RAM[SP] = t.range(7,4);
+				set(SP, t.range(7,4));
 				SP--;
-				RAM[SP] = t.range(3,0);
+				set(SP, t.range(3,0));
 				SP--;
 				PC = (op2 << 8) + op1;
 				return;
 	
 			case inst_rts_imp:
 				SP++;
-				l = RAM[SP];
+				l = get(SP]);
 				SP++;
-				h = RAM[SP];
+				h = get(SP);
 				PC = (h << 8) | l + 1;
 				return;
 			
@@ -327,14 +345,13 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_lda_abs:
-				//std::cerr << std::hex << (op2<<8) + op1 << std::endl;
-				A = RAM[(op2<<8) + op1];
+				A = get((op2<<8) + op1);;
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
 			
 			case inst_lda_abs_x:
-				A = RAM[(op2<<8) + op1 + X.to_uint()];
+				A = get((op2<<8) + op1 + X.to_uint());
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
@@ -346,7 +363,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_ldx_abs:
-				X = RAM[(op2<<8) + op1];
+				X = get((op2<<8) + op1);
 				N = X[7].to_bool();
 				Z = (X.to_uint() == 0);
 				return;
@@ -359,30 +376,30 @@ struct SorhajoKapitany: public sc_module {
 	
 			case inst_pla_imp:
 				SP++;
-				A = RAM[SP.to_uint()];
+				A = get(SP.to_uint());
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
 				
 			case inst_pha_imp:
-				RAM[SP] = A.to_uint();
+				set(SP, A.to_uint());
 				SP = SP-1;
 				return;
 				
 			case inst_sta_abs:
-				RAM[(op2<<8) + op1] = A.to_uint();
+				set((op2<<8) + op1, A);
 				return;
 			
 			case inst_sta_abs_x:
-				RAM[(op2<<8) + op1 + X.to_uint()] = A.to_uint();
+				set((op2<<8) + op1 + X.to_uint(), A);
 				return;
 			
 			case inst_stx_abs:
-				RAM[(op2<<8) + op1] = X.to_uint();
+				set((op2<<8) + op1, X);
 				return;
 
 			case inst_sty_abs:
-				RAM[(op2<<8) + op1] = Y.to_uint();
+				set((op2<<8) + op1, Y);
 				return;
 			
 			case inst_tax_imp:

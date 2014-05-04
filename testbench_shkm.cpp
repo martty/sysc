@@ -24,7 +24,10 @@ int sc_main(int argc, char* argv[]){
 	
 	sc_signal < sc_lv<16> > Address;
 	sc_signal < sc_lv<8> > Data;
-	sc_signal < sc_lv<1> >	RWneg;
+	sc_signal < bool >	readneg;
+	sc_signal < bool >	writeneg;
+	sc_signal < bool >	csnegsyscv;
+	sc_signal < bool >	csnegdaft;
 
 	// internal connections -----------------------
 	CLKGEN.ClkOut(Clk);
@@ -35,12 +38,23 @@ int sc_main(int argc, char* argv[]){
 	SYSTEM.Abort(Abort);
 	SYSTEM.Data(Data);
 	SYSTEM.Address(Address);
-	SYSTEM.RWneg(RWneg);
+	SYSTEM.readneg(readneg);
+	SYSTEM.writeneg(writeneg);
 	
 	DAFT.Clk(Clk);
 	DAFT.Address(Address);
 	DAFT.Data(Data);
-	DAFT.RWneg(RWneg);
+	DAFT.readneg(readneg);
+	DAFT.writeneg(writeneg);
+	
+	CSneg_Daft cd("csnegdaft");
+	cd(Address, csnegdaft);
+	
+	CSneg_SysCVideo cs("csnegsyscv");
+	cs(Address, csnegsyscv);
+	
+	SysCVideo gk("gk");
+    gk(Address, Data, readneg, writeneg, csnegsyscv);
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
   
