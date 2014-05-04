@@ -60,6 +60,14 @@ int sc_main(int argc, char* argv[]){
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
   
+	
+  
+	std::cin.get();
+  
+	Reset.write("1");
+	sc_start(340,SC_NS);
+	Reset.write("0");
+	
 	if(argc != 3 ){
 		std::cout << "Pass binary file to load as parameter and address to load at" << std::endl;
 		return 1;
@@ -78,12 +86,6 @@ int sc_main(int argc, char* argv[]){
 		}
 		fclose(f);
 	}
-  
-	std::cin.get();
-  
-	Reset.write("1");
-	sc_start(340,SC_NS);
-	Reset.write("0");
   
 	while(true){
 		sc_start(1,SC_NS);
