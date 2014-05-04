@@ -75,6 +75,10 @@ struct SorhajoKapitany: public sc_module {
   sc_in		< bool >		Clk;
   sc_in		< sc_lv<1> >	Reset;
   
+  
+  sc_out	< sc_lv<1> >	RWneg;
+  sc_inout	< sc_lv<8> >	Data;
+  sc_out	< sc_lv<16> >	Address;
   sc_out	< sc_lv<1> >	Abort;
   // internal resources ----------------
   sc_uint<16>	PC;     // instruction pointer
@@ -82,12 +86,7 @@ struct SorhajoKapitany: public sc_module {
   sc_lv<24>		IR;		// intermediate register
   
   sc_uint<8>		A, X, Y, SP;
-  // RAM
-  sc_uint<8> RAM[0x10000];
   unsigned current_fetch;
-  
-  
-  
 
   
   //-----------------------------------------------------------------------------------------------
@@ -133,7 +132,7 @@ struct SorhajoKapitany: public sc_module {
 		sc_uint<8> M, t, l, h;
 		switch (opcode){
 			case inst_adc_abs:
-				M = RAM[op2<<8 + op1];
+				Address = (op2<<8) + op1;
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
@@ -176,6 +175,20 @@ struct SorhajoKapitany: public sc_module {
 				h = RAM[0xFFFF]<<8;
 				PC = h|l;
 				return;	
+				
+			case inst_cpx_imm:
+				t = op1 - X;
+				N = t[7].to_bool();
+				C = (X>=op1);
+				Z = (t==0); 
+				return;
+			
+			case inst_cpy_imm:
+				t = op1 - Y;
+				N = t[7].to_bool();
+				C = (Y>=op1);
+				Z = (t==0); 
+				return;
 			
 			case inst_dex_imp:
 				X--;

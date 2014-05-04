@@ -1,5 +1,6 @@
 #include <systemc.h>
 #include "matroz.cpp"
+#include "daftpunk.cpp"
 #include "sorhajokapitanymag.cpp"
 //-------------------------------------------------------------------------------------------------
 int sc_main(int argc, char* argv[]){
@@ -9,6 +10,8 @@ int sc_main(int argc, char* argv[]){
 	// component instantiations -------------------
 	// clock generator ----------------------------
 	ClockGenerator CLKGEN("CLKGEN");
+	
+	DaftPunk	DAFT("DAFT");
 
 	SorhajoKapitany SYSTEM("SYSTEM");
 
@@ -18,13 +21,26 @@ int sc_main(int argc, char* argv[]){
 	sc_signal < sc_lv<1> >    Reset;
 	//---------------------------------------------
 	sc_signal < sc_lv<1> >	Abort;
+	
+	sc_signal < sc_lv<16> > Address;
+	sc_signal < sc_lv<8> > Data;
+	sc_signal < sc_lv<1> >	RWneg;
 
 	// internal connections -----------------------
 	CLKGEN.ClkOut(Clk);
 
 	SYSTEM.Clk(Clk);
+	
 	SYSTEM.Reset(Reset);
 	SYSTEM.Abort(Abort);
+	SYSTEM.Data(Data);
+	SYSTEM.Address(Address);
+	SYSTEM.RWneg(RWneg);
+	
+	DAFT.Clk(Clk);
+	DAFT.Address(Address);
+	DAFT.Data(Data);
+	DAFT.RWneg(RWneg);
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
   
