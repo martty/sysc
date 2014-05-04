@@ -70,7 +70,7 @@ struct SorhajoKapitany: public sc_module {
   
   sc_out	< sc_lv<1> >	Abort;
   // internal resources ----------------
-  sc_uint<8>	PC;     // instruction pointer
+  sc_uint<16>	PC;     // instruction pointer
   sc_lv<8>      P;		// zero flag
   sc_lv<24>		IR;		// intermediate register
   
@@ -96,6 +96,7 @@ struct SorhajoKapitany: public sc_module {
 				do {
 					Fetch();
 				} while (Decode());
+				PC++;
 				Execute();
 			}
 			wait();
@@ -126,8 +127,6 @@ struct SorhajoKapitany: public sc_module {
 		
 		
 		};
-		
-		PC++;
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
