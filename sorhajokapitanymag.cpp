@@ -65,7 +65,7 @@ struct SorhajoKapitany: public sc_module {
   
   // RAM
   unsigned short RAM[0x10000];
-  unsigned current_fetch = 0;
+  unsigned current_fetch;
   
   
   
@@ -107,7 +107,7 @@ struct SorhajoKapitany: public sc_module {
 	void Execute() {
 	}
 	
-	void getFetchCount(unsigned int op){
+	unsigned int getFetchCount(unsigned int op){
 		return 1;
 	}
 	
