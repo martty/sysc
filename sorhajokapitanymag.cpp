@@ -99,8 +99,8 @@ struct SorhajoKapitany: public sc_module {
 				} while (Decode());
 				Execute();
 			}
+			wait();
 		}
-		wait();
 	}
 	
 	void Fetch() {
