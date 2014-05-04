@@ -71,11 +71,17 @@ struct SorhajoKapitany: public sc_module {
   
   sc_out	< sc_lv<1> >	Abort;
   // internal resources ----------------
-  sc_lv<8>      PC;     // instruction pointer
+  sc_int<8>		PC;     // instruction pointer
   sc_lv<8>      P;		// zero flag
-    
+  sc_lv<24>		IR;		// intermediate register
+  
+  sc_lv<8>		A, X, Y, SP;
   // RAM
   unsigned short RAM[0x10000];
+  unsigned current_fetch;
+  
+  
+  
 
   
   //-----------------------------------------------------------------------------------------------
@@ -86,20 +92,49 @@ struct SorhajoKapitany: public sc_module {
 				PC = 0;
 				P = 0;
 			} else {
-				
-				case(
-			
+
+				current_fetch = 0;
+				do {
+					Fetch();
+				} while (Decode());
+				Execute();
+
 				wait();
 			}
 		}
 	}
+	
+	void Fetch() {
+		IR.range(current_fetch*8+7, current_fetch*8) = RAM[PC];
+		std::cerr << "Fetched " << IR.range(current_fetch*8+7, current_fetch*8).to_uint() << std::endl;
+	}
+	
+	bool Decode() {
+		if (getFetchCount(IR.range(7,0).to_uint()) > current_fetch){
+			PC++;
+			current_fetch++;
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	void Execute() {
+	}
+	
+	unsigned int getFetchCount(unsigned int op){
+		return 1;
+	}
+	
   //-----------------------------------------------------------------------------------------------
   // contructor ------------------------
   SC_CTOR(SorhajoKapitany) {
     SC_THREAD(FunctionThread); sensitive << Clk.pos();
     // initialize internal variables ---
-    PC = 0;
+    PC = 0xC000;
     P = 0;
+	A = X = Y = 0;
+	SP = 0x01FF;
   }
 
 };
