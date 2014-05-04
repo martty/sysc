@@ -126,17 +126,23 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	unsigned int get(unsigned int addr){
-		Address.write(addr);
+		readneg.write(1);
 		writeneg.write(1);
+		Address.write(addr);
 		readneg.write(0);
+		readneg.write(1);
+		writeneg.write(1);
 		return sc_uint<8>(Data.read().to_uint());
 	}
 	
 	void set(unsigned int addr, unsigned int value){
+		readneg.write(1);
+		writeneg.write(1);
 		Address.write(addr);
 		Data.write(value);
 		writeneg.write(0);
 		readneg.write(1);
+		writeneg.write(1);
 	}
 	
 	void Execute() {
