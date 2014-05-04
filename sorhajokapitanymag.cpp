@@ -132,15 +132,13 @@ struct SorhajoKapitany: public sc_module {
 	
 	unsigned int getFetchCount(unsigned int op){
 		int i;
-		for(i=0, i<40, i++){
+		for(i=0; i<40; i++){
 			if(op == inst_type[i])
-			break;
+				break;
 		}
-		switch(i){
-			case i<14: return 1;
-			case i<27: return 2;
-			default: return 3;
-		}
+		if(i < 14) return 1;
+		if(i < 27) return 2;
+		return 3;
 	}
 	
   //-----------------------------------------------------------------------------------------------
