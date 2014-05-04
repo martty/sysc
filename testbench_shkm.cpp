@@ -50,7 +50,7 @@ int sc_main(int argc, char* argv[]){
 	Reset.write("0");
   
 	while(true){
-		sc_start(10,SC_NS);
+		sc_start(1,SC_NS);
 		if(Abort.read() == "1"){
 			break;
 		}

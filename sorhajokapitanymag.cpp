@@ -91,8 +91,8 @@ struct SorhajoKapitany: public sc_module {
 			// reset all internal variables
 				PC = 0xC000;
 				P = 0;
+				IR = 0;
 			} else {
-
 				current_fetch = 1;
 				do {
 					Fetch();
@@ -120,6 +120,7 @@ struct SorhajoKapitany: public sc_module {
 	
 	void Execute() {
 		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8, 0).to_uint() << "@" << PC.to_uint() << std::endl;
+		PC++;
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
