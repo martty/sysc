@@ -130,7 +130,7 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
-		sc_uint<8> M, t;
+		sc_uint<8> M, t, l, h;
 		switch (opcode){
 			case inst_adc_abs:
 				M = RAM[op2<<8 + op1];
@@ -165,7 +165,6 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_brk_imp:
-				sc_uint<8> l,h;
 				PC = PC + 1;
 				RAM [SP] = PC.range(15,8);
 				SP = SP - 1;
@@ -175,20 +174,20 @@ struct SorhajoKapitany: public sc_module {
 				SP = SP - 1;
 				l = RAM[0xFFFE];
 				h = RAM[0xFFFF]<<8;
-				PC = h|l  ;
+				PC = h|l;
 				return;	
 			
 			case inst_lda_imm:
 				A = op1;
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
-				return
+				return;
 	
 			case inst_lda_abs:
 				A = RAM[op2<<8 + op1];
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
-				return
+				return;
 			
 			case inst_lda_abs_x:
 				A = RAM[op2<<8 + op1 + X.to_uint()];
