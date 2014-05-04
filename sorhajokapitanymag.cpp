@@ -78,7 +78,7 @@ struct SorhajoKapitany: public sc_module {
   
   sc_out	< bool >	readneg;
   sc_out	< bool >	writeneg;
-  sc_inout	< sc_lv<8> >	Data;
+  sc_inout_rv	< 8 >	Data;
   sc_out	< sc_lv<16> >	Address;
   sc_out	< sc_lv<1> >	Abort;
   // internal resources ----------------

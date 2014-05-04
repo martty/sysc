@@ -25,7 +25,7 @@ int sc_main(int argc, char* argv[]){
 	
 	sc_signal < sc_lv<16> > Address("Address");
 	sc_signal < sc_lv<12> > addrout("addrout");
-	sc_signal < sc_lv<8> > Data("data");
+	sc_signal_rv < 8 > Data("data");
 	sc_signal < bool >	readneg("rneg");
 	sc_signal < bool >	writeneg("wneg");
 	sc_signal < bool >	csnegsyscv("cssyscv");
@@ -43,7 +43,7 @@ int sc_main(int argc, char* argv[]){
 	SYSTEM.readneg(readneg);
 	SYSTEM.writeneg(writeneg);
 	
-	CSneg_Daft cd("csnegdaft");
+	CSneg_Daft cd("csnegdaftd");
 	cd(Address, csnegdaft);
 	
 	DAFT.Address(Address);

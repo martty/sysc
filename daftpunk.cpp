@@ -29,7 +29,7 @@ struct DaftPunk: public sc_module {
 				Data.write( RAM[Address.read().to_uint()] ); 
 			}
 		} else {
-			Data = 'ZZZZZZZZ';
+			Data = "ZZZZZZZZ";
 		}
 	}
 };
