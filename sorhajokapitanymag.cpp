@@ -312,7 +312,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_inc_abs:
-				M = get((op2 << 8)+op1)++;
+				M = get((op2 << 8)+op1) + 1;
 				set((op2 << 8)+op1, M);
 				N = M[7].to_bool();
 				Z = M.to_uint() == 0;
@@ -333,7 +333,7 @@ struct SorhajoKapitany: public sc_module {
 	
 			case inst_rts_imp:
 				SP++;
-				l = get(SP]);
+				l = get(SP);
 				SP++;
 				h = get(SP);
 				PC = (h << 8) | l + 1;
