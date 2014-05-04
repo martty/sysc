@@ -187,46 +187,46 @@ struct SorhajoKapitany: public sc_module {
 				
 			case inst_and_imm:
 				A = A & op1;
-				N = A[7];
+				N = A[7].to_bool();
 				Z = (A==0);
 				return;
 			
 			case inst_eor_imm:
 				A = A ^ op1;
-				N = A[7];
+				N = A[7].to_bool();
 				Z = (A==0); 
 				return;
 			
 			case inst_asl_a:
-				P.C = A[7];
+				C = A[7].to_bool();
 				A = (A << 1) & 0xFE;
-				N = A[7];
+				N = A[7].to_bool();
 				Z = (A==0);
 				return;
 				
 			case inst_asl_abs:
 				M = RAM[(op2<<8) + op1];
-				C = M[7];
+				C = M[7].to_bool();
 				M = (M << 1) & 0xFE;
-				N = M[7];
+				N = M[7].to_bool();
 				Z = (B==0);
 				return;
 			
 			case inst_rol_a:
-				t = A[7];
+				sc_uint temp = A[7];
 				A = (A << 1) & 0xFE;
 				A = A | C;
-				C = t;
+				C = temp.to_bool();
 				Z = (A==0);
 				N = A[7];    
 				return;
 				
 			case inst_rol_abs:
 				M = RAM[(op2<<8) + op1];
-				t = M[7];
+				sc_uint temp = A[7];
 				M = (M << 1) & 0xFE;
 				M = M | C;
-				C = t;
+				C = temp.to_bool();
 				Z = (A==0);
 				N = A[7]; 
 				RAM[(op2<<8) + op1] = M;
@@ -252,7 +252,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 			case inst_cmp_imm:
 				t = op1 - A;
-				N = t[7];
+				N = t[7].to_bool();
 				C = (A>=M);
 				Z = (t==0);
 
