@@ -216,7 +216,7 @@ struct SorhajoKapitany: public sc_module {
 			case inst_rol_a:
 				temp = A[7].to_bool();
 				A = (A << 1) & 0xFE;
-				A = A | C;
+				A = A | C.to_char();
 				C = temp;
 				Z = (A==0);
 				N = A[7];    
@@ -226,20 +226,20 @@ struct SorhajoKapitany: public sc_module {
 				M = RAM[(op2<<8) + op1];
 				temp = A[7].to_bool();
 				M = (M << 1) & 0xFE;
-				M = M | C;
+				M = M | C.to_char();
 				C = temp;
 				Z = (A==0);
-				N = A[7]; 
+				N = A[7].to_bool(); 
 				RAM[(op2<<8) + op1] = M;
 				return;
 				
 			case inst_bcc_rel:
-				REL = IR.range(15, 8);
+				REL = IR.range(15, 8).to_int();
 				if (C == 0)  PC = PC + REL;
 				return;
 				
 			case inst_bcs_rel:
-				REL = IR.range(15, 8);
+				REL = IR.range(15, 8).to_int();
 				if (C == 0)  PC = PC + REL;
 				return;
 	
