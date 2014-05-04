@@ -54,8 +54,9 @@
 	static const unsigned inst_tay_imp = 0xa8;
 	static const unsigned inst_txa_imp = 0x8a;
 	static const unsigned inst_tya_imp = 0x98;
+	static const unsigned inst_brk_imp = 0x00;
 	
-int inst_type[41]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
+int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
 					inst_asl_a, inst_rol_a,
 					inst_adc_imm, inst_and_imm, inst_com_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
 					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bsc_rel,
@@ -63,9 +64,9 @@ int inst_type[41]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst
 					inst_sty_abs,
 					inst_lda_x, inst_sta_x
 					};
-//	0-13: 1
-//	14-26: 2
-//	27-39: 3
+//	0-14: 1
+//	15-27: 2
+//	28-40: 3
 	
 	
 struct SorhajoKapitany: public sc_module {
@@ -163,7 +164,7 @@ struct SorhajoKapitany: public sc_module {
 					}
 				return;
 				
-			case inst_brk_:
+			case inst_brk_imp:
 				sc_uint<8> l,h;
 				PC = PC + 1;
 				RAM [SP] = PC.range(15,8);
@@ -185,8 +186,8 @@ struct SorhajoKapitany: public sc_module {
 			if(op == inst_type[i])
 				break;
 		}
-		if(i < 14) return 1;
-		if(i < 27) return 2;
+		if(i < 15) return 1;
+		if(i < 28) return 2;
 		return 3;
 	}
 	
