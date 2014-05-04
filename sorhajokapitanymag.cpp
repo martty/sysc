@@ -1,5 +1,11 @@
 #ifndef SORHAJO_BEHAVIORAL
 #define SORHAJO_BEHAVIORAL
+#define P.N P[0]
+#define P.V P[1]
+#define P.D P[3]
+#define P.Z P[5]
+#define P.C P[6]
+
 //-------------------------------------------------------------------------------------------------
 #include <systemc.h>
 #include <iostream>
@@ -124,8 +130,33 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
 		switch (opcode){
-		
-		
+			case inst_adc_abs:
+				sc_uint<8> M = RAM[op2<<8 + op1];
+				sc_uint<8> t = A.to_uint() + M + P.C;
+				P.V = (A[7]!=t[7]) ? 1:0;
+				P.N = A[7];
+				P.Z = (t==0) ? 1:0;
+				if (P.D)
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + P.C;
+					P.C = (t>99) ? 1:0;
+				else
+					P.C = (t>255) ? 1:0;
+					A = t & 0xFF  ;
+				return;
+				
+			case inst_adc_imm:
+				sc_uint<8> M = RAM[PC.range(15:0)<<8 + op1];
+				sc_uint<8> t = A.to_uint() + M + P.C;
+				P.V = (A[7]!=t[7]) ? 1:0;
+				P.N = A[7];
+				P.Z = (t==0) ? 1:0;
+				if (P.D)
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + P.C;
+					P.C = (t>99) ? 1:0;
+				else
+					P.C = (t>255) ? 1:0;
+					A = t & 0xFF  ;
+				return;
 		};
 	}
 	
