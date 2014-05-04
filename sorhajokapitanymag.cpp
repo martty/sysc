@@ -76,7 +76,8 @@ struct SorhajoKapitany: public sc_module {
   sc_in		< sc_lv<1> >	Reset;
   
   
-  sc_out	< sc_lv<1> >	RWneg;
+  sc_out	< bool >	readneg;
+  sc_out	< bool >	writeneg;
   sc_inout	< sc_lv<8> >	Data;
   sc_out	< sc_lv<16> >	Address;
   sc_out	< sc_lv<1> >	Abort;
@@ -125,14 +126,14 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	unsigned int get(unsigned int addr){
-		Address.write((op2<<8) + op1);
+		Address.write(addr);
 		writeneg.write(1);
 		readneg.write(0);
 		return sc_uint<8>(Data.read().to_uint());
 	}
 	
 	void set(unsigned int addr, unsigned int value){
-		Address.write((op2<<8) + op1);
+		Address.write(addr);
 		Data.write(value);
 		writeneg.write(0);
 		readneg.write(1);

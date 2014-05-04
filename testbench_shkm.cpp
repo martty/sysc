@@ -42,7 +42,6 @@ int sc_main(int argc, char* argv[]){
 	SYSTEM.readneg(readneg);
 	SYSTEM.writeneg(writeneg);
 	
-	DAFT.Clk(Clk);
 	DAFT.Address(Address);
 	DAFT.Data(Data);
 	DAFT.readneg(readneg);
