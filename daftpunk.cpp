@@ -9,7 +9,7 @@ struct DaftPunk: public sc_module {
 	sc_in<bool> readneg;
     sc_in<bool> writeneg;
 	sc_in<bool> csneg;
-	sc_inout	< sc_lv<8> >  Data;
+	sc_inout_rv	< 8 >  Data;
 	
 	sc_uint<8> RAM[0x10000];
 	// constructor --------------------------------
@@ -17,7 +17,9 @@ struct DaftPunk: public sc_module {
 		SC_METHOD(FunctionThread);
 		sensitive << readneg << writeneg;
 		// Program memory initialization --
-		//---------------------------------
+		for (unsigned int i = 0; i < 0x1000; i++){
+			RAM[i] = 0;
+		}
 	}
 	// function thread ----------------------------
 	void FunctionThread(){
