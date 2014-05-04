@@ -131,9 +131,12 @@ struct SorhajoKapitany: public sc_module {
 		writeneg.write(1);
 		Address.write(addr);
 		readneg.write(0);
+		wait();
+		sc_uint<8> rd  = (Data.read().to_uint());
 		readneg.write(1);
 		writeneg.write(1);
-		return sc_uint<8>(Data.read().to_uint());
+		wait();
+		return rd;
 	}
 	
 	void set(unsigned int addr, unsigned int value){
@@ -142,8 +145,10 @@ struct SorhajoKapitany: public sc_module {
 		Address.write(addr);
 		Data.write(value);
 		writeneg.write(0);
+		wait();
 		readneg.write(1);
 		writeneg.write(1);
+		wait();
 	}
 	
 	void Execute() {
