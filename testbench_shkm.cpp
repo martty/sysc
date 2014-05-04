@@ -54,7 +54,7 @@ int sc_main(int argc, char* argv[]){
 	cs(Address, csnegsyscv);
 	
 	SysCVideo gk("gk");
-    gk(Address, Data, readneg, writeneg, csnegsyscv);
+    gk(Address.range(11,0), Data, readneg, writeneg, csnegsyscv);
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
   
