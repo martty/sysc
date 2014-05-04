@@ -1,6 +1,7 @@
 #include <systemc.h>
 #include "matroz.cpp"
 #include "daftpunk.cpp"
+#include "syscvideo.h"
 #include "sorhajokapitanymag.cpp"
 //-------------------------------------------------------------------------------------------------
 int sc_main(int argc, char* argv[]){
@@ -72,7 +73,7 @@ int sc_main(int argc, char* argv[]){
 		for (unsigned int i = 0; i < fsize; i++){
 			unsigned int tmp = 0;
 			fread(&tmp, 1, 1, f);
-			SYSTEM.RAM[start + i] = tmp;
+			DAFT.RAM[start + i] = tmp;
 		}
 		fclose(f);
 	}

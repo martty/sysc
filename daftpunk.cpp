@@ -13,24 +13,21 @@ struct DaftPunk: public sc_module {
 	sc_uint<8> RAM[0x10000];
 	// constructor --------------------------------
 	SC_CTOR(DaftPunk){
-		SC_THREAD(FunctionThread);
+		SC_METHOD(FunctionThread);
 		sensitive << readneg << writeneg;
 		// Program memory initialization --
 		//---------------------------------
 	}
 	// function thread ----------------------------
 	void FunctionThread(){
-		while (1){
-			if ( writeneg.read() == 0 ) { 
-				RAM[Address.read().to_uint()] = Data.read(); 
-			}
-			else if ( readneg.read() == 0 ) { 
-				Data.write( RAM[Address.read().to_uint()] ); 
-			}
-			wait();
+		if ( writeneg.read() == 0 ) { 
+			RAM[Address.read().to_uint()] = Data.read(); 
+		}
+		else if ( readneg.read() == 0 ) { 
+			Data.write( RAM[Address.read().to_uint()] ); 
 		}
 	}
 };
 //-------------------------------------------------------------------------------------------------
-#endif; /* DAFTPUNK */
+#endif /* DAFTPUNK */
 //-------------------------------------------------------------------------------------------------

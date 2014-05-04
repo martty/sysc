@@ -36,7 +36,7 @@ struct CSneg_Daft : public sc_module{
 struct CSneg_SysCVideo : public sc_module{
 	sc_in	< sc_lv<16> > Address;
 	sc_out  < bool >  csneg;
-	SC_CTOR(CSneg_Daft) { 
+	SC_CTOR(CSneg_SysCVideo) { 
 		SC_METHOD(CS); 
 		dont_initialize();
 		sensitive << Address;

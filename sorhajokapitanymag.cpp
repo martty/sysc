@@ -110,7 +110,7 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	void Fetch() {
-		IR.range((current_fetch-1)*8+7, (current_fetch-1)*8) = RAM[PC];
+		IR.range((current_fetch-1)*8+7, (current_fetch-1)*8) = get(PC);
 		std::cerr << "Fetched " << std::hex << IR.range((current_fetch-1)*8+7, (current_fetch-1)*8).to_uint() << std::endl;
 	}
 	
