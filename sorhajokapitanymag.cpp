@@ -57,10 +57,9 @@ int inst_type[41]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst
 					inst_sty_abs,
 					inst_lda_x, inst_sta_x
 					};
-//	0-12: 1
-//	13-20: 2
-//	21-24: 2
-//	25-38: 3
+//	0-13: 1
+//	14-26: 2
+//	27-39: 3
 	
 	
 struct SorhajoKapitany: public sc_module {
@@ -119,10 +118,23 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	void Execute() {
+	
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
+		int i;
+		for(i=0, i<40, i++){
+		if(op==inst_type(i))
+		break;
+		}
+		switch(i){
+		case i<14:
 		return 1;
+		case i<27:
+		return 2;
+		default: 
+		return 3;
+		}
 	}
 	
   //-----------------------------------------------------------------------------------------------
