@@ -1,10 +1,10 @@
 #ifndef SORHAJO_BEHAVIORAL
 #define SORHAJO_BEHAVIORAL
-#define P.N P[0]
-#define P.V P[1]
-#define P.D P[3]
-#define P.Z P[5]
-#define P.C P[6]
+#define N P[0]
+#define V P[1]
+#define D P[3]
+#define Z P[5]
+#define C P[6]
 
 //-------------------------------------------------------------------------------------------------
 #include <systemc.h>
@@ -54,8 +54,9 @@
 	static const unsigned inst_tay_imp = 0xa8;
 	static const unsigned inst_txa_imp = 0x8a;
 	static const unsigned inst_tya_imp = 0x98;
+	static const unsigned inst_brk_imp = 0x00;
 	
-int inst_type[41]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
+int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
 					inst_asl_a, inst_rol_a,
 					inst_adc_imm, inst_and_imm, inst_com_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
 					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bsc_rel,
@@ -63,9 +64,9 @@ int inst_type[41]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst
 					inst_sty_abs,
 					inst_lda_abs_x, inst_sta_abs_x
 					};
-//	0-13: 1
-//	14-26: 2
-//	27-39: 3
+//	0-14: 1
+//	15-27: 2
+//	28-40: 3
 	
 	
 struct SorhajoKapitany: public sc_module {
@@ -80,7 +81,7 @@ struct SorhajoKapitany: public sc_module {
   sc_lv<8>      P;		// zero flag
   sc_lv<24>		IR;		// intermediate register
   
-  sc_lv<8>		A, X, Y, SP;
+  sc_uint<8>		A, X, Y, SP;
   // RAM
   sc_uint<8> RAM[0x10000];
   unsigned current_fetch;
@@ -129,34 +130,53 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
+		sc_uint<8> M, t;
 		switch (opcode){
 			case inst_adc_abs:
-				sc_uint<8> M = RAM[op2<<8 + op1];
-				sc_uint<8> t = A.to_uint() + M + P.C;
-				P.V = (A[7]!=t[7]) ? 1:0;
-				P.N = A[7];
-				P.Z = (t==0) ? 1:0;
-				if (P.D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + P.C;
-					P.C = (t>99) ? 1:0;
-				else
-					P.C = (t>255) ? 1:0;
+				M = RAM[op2<<8 + op1];
+				t = C.to_bool() ? A + M + 1 :  A + M ;
+				V = (A[7]!=t[7]);
+				N =  A[7].to_bool();
+				Z = (t==0);
+				if (D.to_bool()){
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_char();
+					C = (t>99);
+					}
+				else{
+					C = (t>255);
 					A = t & 0xFF  ;
+					}
 				return;
 				
 			case inst_adc_imm:
-				sc_uint<8> M = RAM[PC.range(15:0)<<8 + op1];
-				sc_uint<8> t = A.to_uint() + M + P.C;
-				P.V = (A[7]!=t[7]) ? 1:0;
-				P.N = A[7];
-				P.Z = (t==0) ? 1:0;
-				if (P.D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + P.C;
-					P.C = (t>99) ? 1:0;
-				else
-					P.C = (t>255) ? 1:0;
+				M = RAM[PC.range(15,0)<<8 + op1];
+				t = C.to_bool() ? A + M + 1 :  A + M ;
+				V = (A[7]!=t[7]);
+				N =  A[7].to_bool();
+				Z = (t==0);
+				if (D.to_bool()){
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_char();
+					C = (t>99);
+					}
+				else{
+					C = (t>255);
 					A = t & 0xFF  ;
+					}
 				return;
+	
+			case inst_brk_imp:
+				sc_uint<8> l,h;
+				PC = PC + 1;
+				RAM [SP] = PC.range(15,8);
+				SP = SP - 1;
+				RAM [SP] = PC.range(7,0);
+				SP = SP - 1;
+				RAM [SP] = P.to_uint()|0x10;
+				SP = SP - 1;
+				l = RAM[0xFFFE];
+				h = RAM[0xFFFF]<<8;
+				PC = h|l  ;
+				return;	
 			
 			case inst_lda_imm:
 				A = op1;
@@ -254,8 +274,8 @@ struct SorhajoKapitany: public sc_module {
 			if(op == inst_type[i])
 				break;
 		}
-		if(i < 14) return 1;
-		if(i < 27) return 2;
+		if(i < 15) return 1;
+		if(i < 28) return 2;
 		return 3;
 	}
 	
