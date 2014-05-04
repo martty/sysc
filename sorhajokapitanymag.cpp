@@ -161,13 +161,13 @@ struct SorhajoKapitany: public sc_module {
 				return;
 				
 			case inst_brk_:
-				uint<8> l,h;
+				sc_uint<8> l,h;
 				PC = PC + 1;
 				RAM [SP] = PC.range(15,8);
 				SP = SP - 1;
-				RAM [SP] = PC.range(7:0);
+				RAM [SP] = PC.range(7,0);
 				SP = SP - 1;
-				RAM [SP] = PC.range(P|0x10);
+				RAM [SP] = P.to_uint()|0x10;
 				SP = SP - 1;
 				l = RAM[0xFFFE];
 				h = RAM[0xFFFF]<<8;
