@@ -119,7 +119,7 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	void Execute() {
-		std::cerr << "Executing " << std::hex << IR.to_uint() << "@" << PC.to_uint() << std::endl;
+		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8, 0).to_uint() << "@" << PC.to_uint() << std::endl;
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
