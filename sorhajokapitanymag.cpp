@@ -24,10 +24,10 @@
 	static const unsigned inst_rol_a = 0x2a;
 	static const unsigned inst_rol_abs = 0x2e;
 	static const unsigned inst_bcc_rel = 0x90;
-	static const unsigned inst_bsc_rel = 0xb0;
+	static const unsigned inst_bcs_rel = 0xb0;
 	static const unsigned inst_beq_rel = 0xf0;
 	static const unsigned inst_bne_rel = 0xd0;
-	static const unsigned inst_com_imm = 0xc9;
+	static const unsigned inst_cmp_imm = 0xc9;
 	static const unsigned inst_cpx_imm = 0xe0;
 	static const unsigned inst_cpy_imm = 0xc0;
 	static const unsigned inst_dex_imp = 0xca;
@@ -58,8 +58,8 @@
 	
 int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
 					inst_asl_a, inst_rol_a,
-					inst_adc_imm, inst_and_imm, inst_com_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
-					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bsc_rel,
+					inst_adc_imm, inst_and_imm, inst_cmp_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
+					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bcs_rel,
 					inst_adc_abs, inst_asl_abs, inst_inc_abs, inst_jmp_abs, inst_jsr_abs, inst_lda_abs, inst_ldx_abs, inst_rol_abs, inst_sta_abs, inst_stx_abs,
 					inst_sty_abs,
 					inst_lda_abs_x, inst_sta_abs_x
@@ -129,10 +129,15 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
+
 		sc_uint<8> M, t, l, h;
+		int REL;
+
+		bool temp;
+		
 		switch (opcode){
 			case inst_adc_abs:
-				Address = (op2<<8) + op1;
+				Address.write((op2<<8) + op1);
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
@@ -148,7 +153,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 				
 			case inst_adc_imm:
-				M = RAM[PC.range(15,0)<<8 + op1];
+				M = RAM[(PC.range(15,0)<<8) + op1];
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
@@ -175,7 +180,7 @@ struct SorhajoKapitany: public sc_module {
 				h = RAM[0xFFFF]<<8;
 				PC = h|l;
 				return;	
-				
+			
 			case inst_cpx_imm:
 				t = op1 - X;
 				N = t[7].to_bool();
@@ -188,8 +193,82 @@ struct SorhajoKapitany: public sc_module {
 				N = t[7].to_bool();
 				C = (Y>=op1);
 				Z = (t==0); 
+
+			case inst_clc_imp:
+				C = 0 ;
+				return;
+				
+			case inst_and_imm:
+				A = A & op1;
+				N = A[7].to_bool();
+				Z = (A==0);
 				return;
 			
+			case inst_eor_imm:
+				A = A ^ op1;
+				N = A[7].to_bool();
+				Z = (A==0); 
+				return;
+			
+			case inst_asl_a:
+				C = A[7].to_bool();
+				A = (A << 1) & 0xFE;
+				N = A[7].to_bool();
+				Z = (A==0);
+				return;
+				
+			case inst_asl_abs:
+				M = RAM[(op2<<8) + op1];
+				C = M[7].to_bool();
+				M = (M << 1) & 0xFE;
+				N = M[7].to_bool();
+				Z = (M==0);
+				return;
+			
+			case inst_rol_a:
+				temp = A[7].to_bool();
+				A = (A << 1) & 0xFE;
+				A = A | C.to_char();
+				C = temp;
+				Z = (A==0);
+				N = A[7].to_bool();    
+				return;
+				
+			case inst_rol_abs:
+				M = RAM[(op2<<8) + op1];
+				temp = A[7].to_bool();
+				M = (M << 1) & 0xFE;
+				M = M | C.to_char();
+				C = temp;
+				Z = (A==0);
+				N = A[7].to_bool(); 
+				RAM[(op2<<8) + op1] = M;
+				return;
+				
+			case inst_bcc_rel:
+				REL = IR.range(15, 8).to_int();
+				if (C == 0)  PC = PC + REL;
+				return;
+				
+			case inst_bcs_rel:
+				REL = IR.range(15, 8).to_int();
+				if (C == 0)  PC = PC + REL;
+				return;
+	
+			case inst_beq_rel:
+				REL = IR.range(15, 8).to_int();
+				if (Z == 1)  PC = PC + REL;
+				return;
+			case inst_bne_rel:
+				REL = IR.range(15, 8).to_int();
+				if (Z == 0)  PC = PC + REL;
+				return;
+			case inst_cmp_imm:
+				t = op1 - A;
+				N = t[7].to_bool();
+				C = (A>=M);
+				Z = (t==0);
+
 			case inst_dex_imp:
 				X--;
 				Z = X==0;
@@ -329,7 +408,10 @@ struct SorhajoKapitany: public sc_module {
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
+
 		};
+		
+		
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
