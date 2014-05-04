@@ -21,7 +21,6 @@
 	static const unsigned inst_bsc_rel = 0xb0;
 	static const unsigned inst_beq_rel = 0xf0;
 	static const unsigned inst_bne_rel = 0xd0;
-	static const unsigned inst_rol_a = 0x2a;
 	static const unsigned inst_com_imm = 0xc9;
 	static const unsigned inst_cpx_imm = 0xe0;
 	static const unsigned inst_cpy_imm = 0xc0;
