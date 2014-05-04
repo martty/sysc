@@ -177,6 +177,21 @@ struct SorhajoKapitany: public sc_module {
 				PC = h|l;
 				return;	
 			
+			
+				static const unsigned inst_dey_imp = 0x88;
+	static const unsigned inst_inx_imp = 0xe8;
+	static const unsigned inst_iny_imp = 0xc8;
+	static const unsigned inst_inc_abs = 0xee;
+	static const unsigned inst_jmp_abs = 0x4c;
+	static const unsigned inst_jsr_abs = 0x20;
+			case inst_rts_imp:
+				SP++;
+				l = RAM[SP];
+				SP++;
+				h = RAM[SP];
+				PC = (h << 8) | l + 1;
+				return;
+			
 			case inst_lda_imm:
 				A = op1;
 				N = A[7].to_bool();
@@ -184,14 +199,14 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_lda_abs:
-				std::cerr << std::hex << (op2<<8) + op1 << std::endl;
+				//std::cerr << std::hex << (op2<<8) + op1 << std::endl;
 				A = RAM[(op2<<8) + op1];
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
 			
 			case inst_lda_abs_x:
-				A = RAM[op2<<8 + op1 + X.to_uint()];
+				A = RAM[(op2<<8) + op1 + X.to_uint()];
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
@@ -203,7 +218,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_ldx_abs:
-				X = RAM[op2<<8 + op1];
+				X = RAM[(op2<<8) + op1];
 				N = X[7].to_bool();
 				Z = (X.to_uint() == 0);
 				return;
@@ -227,19 +242,19 @@ struct SorhajoKapitany: public sc_module {
 				return;
 				
 			case inst_sta_abs:
-				RAM[op2<<8 + op1] = A.to_uint();
+				RAM[(op2<<8) + op1] = A.to_uint();
 				return;
 			
 			case inst_sta_abs_x:
-				RAM[op2<<8 + op1 + X.to_uint()] = A.to_uint();
+				RAM[(op2<<8) + op1 + X.to_uint()] = A.to_uint();
 				return;
 			
 			case inst_stx_abs:
-				RAM[op2<<8 + op1] = X.to_uint();
+				RAM[(op2<<8) + op1] = X.to_uint();
 				return;
 
 			case inst_sty_abs:
-				RAM[op2<<8 + op1] = Y.to_uint();
+				RAM[(op2<<8) + op1] = Y.to_uint();
 				return;
 			
 			case inst_tax_imp:
