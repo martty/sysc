@@ -184,6 +184,7 @@ struct SorhajoKapitany: public sc_module {
 				return;
 	
 			case inst_lda_abs:
+				std::cerr << std::hex << op2<<8 + op1 << std::endl;
 				A = RAM[op2<<8 + op1];
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
