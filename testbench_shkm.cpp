@@ -43,13 +43,14 @@ int sc_main(int argc, char* argv[]){
 	SYSTEM.readneg(readneg);
 	SYSTEM.writeneg(writeneg);
 	
+	CSneg_Daft cd("csnegdaft");
+	cd(Address, csnegdaft);
+	
 	DAFT.Address(Address);
 	DAFT.Data(Data);
 	DAFT.readneg(readneg);
 	DAFT.writeneg(writeneg);
-	
-	CSneg_Daft cd("csnegdaft");
-	cd(Address, csnegdaft);
+	DAFT.csneg(csnegdaft);
 	
 	CSneg_SysCVideo cs("csnegsyscv");
 	cs(Address, csnegsyscv, addrout);

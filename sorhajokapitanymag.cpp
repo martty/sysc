@@ -119,6 +119,7 @@ struct SorhajoKapitany: public sc_module {
 		if (getFetchCount(IR.range(7,0).to_uint()) > current_fetch){
 			PC++;
 			current_fetch++;
+			wait();
 			return true;
 		} else {
 			return false;
