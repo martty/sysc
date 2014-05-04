@@ -336,9 +336,9 @@ struct SorhajoKapitany: public sc_module {
 	
 			case inst_jsr_abs:
 				t = PC-1;
-				set(SP, t.range(7,4));
+				set(SP, t.range(15,8));
 				SP--;
-				set(SP, t.range(3,0));
+				set(SP, t.range(7,0));
 				SP--;
 				PC = (op2 << 8) + op1;
 				return;

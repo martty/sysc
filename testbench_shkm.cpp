@@ -70,7 +70,7 @@ int sc_main(int argc, char* argv[]){
   sc_trace(tf,SYSTEM.Data,"Data");
   sc_trace(tf,SYSTEM.Address,"Address");
   sc_trace(tf,DAFT.csneg,"CSNEG_DAFT");
-  sc_trace(tf,gk.csneg,"CSNEG_DAFT");
+  sc_trace(tf,gk.csneg,"CSNEG_SysCVideo");
 	
   
 	std::cin.get();
