@@ -10,7 +10,7 @@
 // instruction set -------------------
 	static const unsigned inst_adc_imm = 0x69;     
 	static const unsigned inst_adc_abs = 0x6D;     
-	static const unsigned inst_clc = 0x18;     
+	static const unsigned inst_clc_imp = 0x18;     
 	static const unsigned inst_and_imm = 0x29;     
 	static const unsigned inst_eor_imm = 0x49;
 	static const unsigned inst_asl_a = 0x0a;
@@ -49,6 +49,20 @@
 	static const unsigned inst_txa_imp = 0x8a;
 	static const unsigned inst_tya_imp = 0x98;
 	
+int inst_type[39]={ inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txy_imp, inst_tya_imp,
+					inst_asl_a, inst_rol_a,
+					inst_adc_imm, inst_and_imm, inst_com_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
+					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bsc_rel,
+					inst_adc_abs, inst_asl_abs, inst_inc_abs, inst_jmp_abs, inst_jsr_abs, inst_lda_abs, inst_ldx_abs, inst_rol_abs, inst_sta_abs, inst_stx_abs,
+					inst_sty_abs, inst_sty_abs,
+					inst_lda_x, inst_sta_x
+					};
+//	0-11: 1
+//	13-20: 2
+//	21-24: 2
+//	25-38: 3
+	
+	
 struct SorhajoKapitany: public sc_module {
   
   // ports -----------------------------
@@ -59,8 +73,7 @@ struct SorhajoKapitany: public sc_module {
   // internal resources ----------------
   sc_lv<8>      PC;     // instruction pointer
   sc_lv<8>      P;		// zero flag
-  
-  
+    
   // RAM
   unsigned short RAM[0x10000];
 
@@ -73,6 +86,9 @@ struct SorhajoKapitany: public sc_module {
 				PC = 0;
 				P = 0;
 			} else {
+				
+				case(
+			
 				wait();
 			}
 		}
