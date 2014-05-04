@@ -1,10 +1,10 @@
 #ifndef SORHAJO_BEHAVIORAL
 #define SORHAJO_BEHAVIORAL
-#define P.N P[0]
-#define P.V P[1]
-#define P.D P[3]
-#define P.Z P[5]
-#define P.C P[6]
+#define N P[0]
+#define V P[1]
+#define D P[3]
+#define Z P[5]
+#define C P[6]
 
 //-------------------------------------------------------------------------------------------------
 #include <systemc.h>
@@ -132,31 +132,44 @@ struct SorhajoKapitany: public sc_module {
 		switch (opcode){
 			case inst_adc_abs:
 				sc_uint<8> M = RAM[op2<<8 + op1];
-				sc_uint<8> t = A.to_uint() + M + P.C;
-				P.V = (A[7]!=t[7]) ? 1:0;
-				P.N = A[7];
-				P.Z = (t==0) ? 1:0;
-				if (P.D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + P.C;
-					P.C = (t>99) ? 1:0;
+				sc_uint<8> t = A.to_uint() + M + C;
+				V = (A[7]!=t[7]) ? 1:0;
+				N = A[7];
+				Z = (t==0) ? 1:0;
+				if (D)
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C;
+					C = (t>99) ? 1:0;
 				else
-					P.C = (t>255) ? 1:0;
+					C = (t>255) ? 1:0;
 					A = t & 0xFF  ;
 				return;
 				
 			case inst_adc_imm:
 				sc_uint<8> M = RAM[PC.range(15:0)<<8 + op1];
-				sc_uint<8> t = A.to_uint() + M + P.C;
-				P.V = (A[7]!=t[7]) ? 1:0;
-				P.N = A[7];
-				P.Z = (t==0) ? 1:0;
-				if (P.D)
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + P.C;
-					P.C = (t>99) ? 1:0;
+				sc_uint<8> t = A.to_uint() + M + C;
+				V = (A[7]!=t[7]) ? 1:0;
+				N = A[7];
+				Z = (t==0) ? 1:0;
+				if (D)
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C;
+					C = (t>99) ? 1:0;
 				else
-					P.C = (t>255) ? 1:0;
+					C = (t>255) ? 1:0;
 					A = t & 0xFF  ;
 				return;
+				
+			case inst_brk:
+				PC = PC + 1;
+				RAM [SP] = PC.range(15:8);
+				SP = SP - 1;
+				RAM [SP] = PC.range(7:0);
+				SP = SP - 1;
+				RAM [SP] = PC.range(P|0x10);
+				SP = SP - 1;
+				l = RAM[0xFFFE];
+				h = RAM[0xFFFF]<<8;
+				PC = h|l  ;
+				return;	
 		};
 	}
 	
