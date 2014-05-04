@@ -70,7 +70,7 @@ struct SorhajoKapitany: public sc_module {
   
   sc_out	< sc_lv<1> >	Abort;
   // internal resources ----------------
-  sc_int<8>		PC;     // instruction pointer
+  sc_uint<8>	PC;     // instruction pointer
   sc_lv<8>      P;		// zero flag
   sc_lv<24>		IR;		// intermediate register
   
@@ -118,27 +118,20 @@ struct SorhajoKapitany: public sc_module {
 	}
 	
 	void Execute() {
-<<<<<<< HEAD
-	
-=======
 		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8, 0).to_uint() << "@" << PC.to_uint() << std::endl;
 		PC++;
->>>>>>> ca5775a33430309578bc4946b43bc2d87617dd5c
 	}
 	
 	unsigned int getFetchCount(unsigned int op){
 		int i;
 		for(i=0, i<40, i++){
-		if(op==inst_type(i))
-		break;
+			if(op == inst_type[i])
+			break;
 		}
 		switch(i){
-		case i<14:
-		return 1;
-		case i<27:
-		return 2;
-		default: 
-		return 3;
+			case i<14: return 1;
+			case i<27: return 2;
+			default: return 3;
 		}
 	}
 	
