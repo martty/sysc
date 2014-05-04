@@ -80,7 +80,7 @@ struct SorhajoKapitany: public sc_module {
   sc_lv<8>      P;		// zero flag
   sc_lv<24>		IR;		// intermediate register
   
-  sc_lv<8>		A, X, Y, SP;
+  sc_uint<8>		A, X, Y, SP;
   // RAM
   sc_uint<8> RAM[0x10000];
   unsigned current_fetch;
