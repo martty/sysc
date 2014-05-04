@@ -23,13 +23,13 @@ int sc_main(int argc, char* argv[]){
 	//---------------------------------------------
 	sc_signal < sc_lv<1> >	Abort;
 	
-	sc_signal < sc_lv<16> > Address;
-	sc_signal < sc_lv<12> > addrout;
-	sc_signal < sc_lv<8> > Data;
-	sc_signal < bool >	readneg;
-	sc_signal < bool >	writeneg;
-	sc_signal < bool >	csnegsyscv;
-	sc_signal < bool >	csnegdaft;
+	sc_signal < sc_lv<16> > Address("Address");
+	sc_signal < sc_lv<12> > addrout("addrout");
+	sc_signal < sc_lv<8> > Data("data");
+	sc_signal < bool >	readneg("rneg");
+	sc_signal < bool >	writeneg("wneg");
+	sc_signal < bool >	csnegsyscv("cssyscv");
+	sc_signal < bool >	csnegdaft("csnegdaft");
 
 	// internal connections -----------------------
 	CLKGEN.ClkOut(Clk);
