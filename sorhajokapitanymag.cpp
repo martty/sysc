@@ -8,6 +8,8 @@
 
 //-------------------------------------------------------------------------------------------------
 #include <systemc.h>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <iomanip>
 #include <set>
@@ -88,6 +90,7 @@ struct SorhajoKapitany: public sc_module {
   
   sc_uint<8>		A, X, Y, SP;
   unsigned current_fetch;
+  std::ofstream log;
 
   
   //-----------------------------------------------------------------------------------------------
@@ -99,6 +102,7 @@ struct SorhajoKapitany: public sc_module {
 				P = 0;
 				IR = 0;
 			} else {
+				IR = 0;
 				current_fetch = 1;
 				do {
 					Fetch();
@@ -130,6 +134,7 @@ struct SorhajoKapitany: public sc_module {
 		readneg.write(1);
 		writeneg.write(1);
 		Address.write(addr);
+		wait();
 		readneg.write(0);
 		wait();
 		sc_uint<8> rd  = (Data.read().to_uint());
@@ -143,11 +148,14 @@ struct SorhajoKapitany: public sc_module {
 		readneg.write(1);
 		writeneg.write(1);
 		Address.write(addr);
+		wait();
 		Data.write(value);
+		wait();
 		writeneg.write(0);
 		wait();
 		readneg.write(1);
 		writeneg.write(1);
+		Data = "ZZZZZZZZ";
 		wait();
 	}
 	
@@ -156,6 +164,7 @@ struct SorhajoKapitany: public sc_module {
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
+		log << std::hex << "(" << PC.to_uint() - current_fetch << ")" << opcode << " " << op1 << " " << op2 << "|P:" << P.to_uint() << " |PC:" << PC.to_uint() << std::endl;
 
 		sc_uint<8> M, t, l, h;
 		int REL;
@@ -336,9 +345,9 @@ struct SorhajoKapitany: public sc_module {
 	
 			case inst_jsr_abs:
 				PC--;
-				set(SP, PC.range(15,8));
+				set(SP, PC.range(15,8).to_uint());
 				SP--;
-				set(SP, PC.range(7,0));
+				set(SP, PC.range(7,0).to_uint());
 				SP--;
 				PC = (op2 << 8) + op1;
 				return;
@@ -464,6 +473,7 @@ struct SorhajoKapitany: public sc_module {
     P = 0;
 	A = X = Y = 0;
 	SP = 0x01FF;
+	log = std::ofstream("decoded.log");
   }
 
 };

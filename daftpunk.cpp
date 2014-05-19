@@ -30,6 +30,7 @@ struct DaftPunk: public sc_module {
 			else if ( readneg.read() == 0 ) { 
 				Data.write( RAM[Address.read().to_uint()] ); 
 			}
+			Data = "ZZZZZZZZ";
 		} else {
 			Data = "ZZZZZZZZ";
 		}
