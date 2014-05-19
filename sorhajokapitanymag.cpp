@@ -16,10 +16,10 @@
 #include <map>
 //-------------------------------------------------------------------------------------------------
 // instruction set -------------------
-	static const unsigned inst_adc_imm = 0x69;     
-	static const unsigned inst_adc_abs = 0x6D;     
-	static const unsigned inst_clc_imp = 0x18;     
-	static const unsigned inst_and_imm = 0x29;     
+	static const unsigned inst_adc_imm = 0x69;
+	static const unsigned inst_adc_abs = 0x6D;
+	static const unsigned inst_clc_imp = 0x18;
+	static const unsigned inst_and_imm = 0x29;
 	static const unsigned inst_eor_imm = 0x49;
 	static const unsigned inst_asl_a = 0x0a;
 	static const unsigned inst_asl_abs = 0x0e;
@@ -57,8 +57,8 @@
 	static const unsigned inst_txa_imp = 0x8a;
 	static const unsigned inst_tya_imp = 0x98;
 	static const unsigned inst_brk_imp = 0x00;
-	
-int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
+
+unsigned int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_imp, inst_inx_imp, inst_iny_imp, inst_pla_imp, inst_pha_imp, inst_rts_imp, inst_tax_imp, inst_tay_imp, inst_txa_imp, inst_tya_imp,
 					inst_asl_a, inst_rol_a,
 					inst_adc_imm, inst_and_imm, inst_cmp_imm, inst_cpx_imm, inst_cpy_imm, inst_eor_imm, inst_lda_imm, inst_ldx_imm, inst_ldy_imm,
 					inst_bcc_rel, inst_beq_rel, inst_bne_rel, inst_bcs_rel,
@@ -69,15 +69,15 @@ int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_imp, inst
 //	0-14: 1
 //	15-27: 2
 //	28-40: 3
-	
-	
+
+
 struct SorhajoKapitany: public sc_module {
-  
+
   // ports -----------------------------
   sc_in		< bool >		Clk;
   sc_in		< sc_lv<1> >	Reset;
-  
-  
+
+
   sc_out	< bool >	readneg;
   sc_out	< bool >	writeneg;
   sc_inout_rv	< 8 >	Data;
@@ -87,12 +87,12 @@ struct SorhajoKapitany: public sc_module {
   sc_uint<16>	PC;     // instruction pointer
   sc_lv<8>      P;		// zero flag
   sc_lv<24>		IR;		// intermediate register
-  
+
   sc_uint<8>		A, X, Y, SP;
   unsigned current_fetch;
   std::ofstream log;
 
-  
+
   //-----------------------------------------------------------------------------------------------
 	void FunctionThread() {
 		while (1) {
@@ -113,12 +113,12 @@ struct SorhajoKapitany: public sc_module {
 			wait();
 		}
 	}
-	
+
 	void Fetch() {
 		IR.range((current_fetch-1)*8+7, (current_fetch-1)*8) = get(PC);
-		std::cerr << "Fetched " << std::hex << IR.range((current_fetch-1)*8+7, (current_fetch-1)*8).to_uint() << std::endl;
+		//std::cerr << "Fetched " << std::hex << IR.range((current_fetch-1)*8+7, (current_fetch-1)*8).to_uint() << std::endl;
 	}
-	
+
 	bool Decode() {
 		if (getFetchCount(IR.range(7,0).to_uint()) > current_fetch){
 			PC++;
@@ -129,7 +129,7 @@ struct SorhajoKapitany: public sc_module {
 			return false;
 		}
 	}
-	
+
 	unsigned int get(unsigned int addr){
 		readneg.write(1);
 		writeneg.write(1);
@@ -137,13 +137,13 @@ struct SorhajoKapitany: public sc_module {
 		wait();
 		readneg.write(0);
 		wait();
-		sc_uint<8> rd  = (Data.read().to_uint());
+		unsigned int rd  = (Data.read().to_uint());
 		readneg.write(1);
 		writeneg.write(1);
 		wait();
 		return rd;
 	}
-	
+
 	void set(unsigned int addr, unsigned int value){
 		readneg.write(1);
 		writeneg.write(1);
@@ -158,23 +158,24 @@ struct SorhajoKapitany: public sc_module {
 		Data = "ZZZZZZZZ";
 		wait();
 	}
-	
+
 	void Execute() {
-		std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8+7, 0).to_uint() << "@" << PC.to_uint() << std::endl;
+		//std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8+7, 0).to_uint() << "@" << PC.to_uint() << std::endl;
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
-		log << std::hex << "(" << PC.to_uint() - current_fetch << ")" << opcode << " " << op1 << " " << op2 << "|P:" << P.to_uint() << " |PC:" << PC.to_uint() << std::endl;
+		log << std::hex << "(" << PC.to_uint() - current_fetch << ")" << std::setw(2) << opcode << " " <<  std::setw(2) << op1 << " " << std::setw(2) << op2 << "|P: " << std::setw(2) << P.to_uint() << "|PC:" << PC.to_uint() << std::endl;
+		log.flush();
 
 		sc_uint<8> M, t, l, h;
 		int REL;
 
 		bool temp;
-		
+
 		switch (opcode){
 			case inst_adc_abs:
 				M = get((op2<<8) + op1);
-				
+
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
@@ -188,7 +189,7 @@ struct SorhajoKapitany: public sc_module {
 					A = t & 0xFF  ;
 					}
 				return;
-				
+
 			case inst_adc_imm:
 				M = get((PC.range(15,0)<<8) + op1);
 				t = C.to_bool() ? A + M + 1 :  A + M ;
@@ -204,7 +205,7 @@ struct SorhajoKapitany: public sc_module {
 					A = t & 0xFF  ;
 					}
 				return;
-	
+
 			case inst_brk_imp:
 				PC = PC + 1;
 				set(SP, PC.range(15,8));
@@ -216,44 +217,44 @@ struct SorhajoKapitany: public sc_module {
 				l = get(0xFFFE);
 				h = get(0xFFFF)<<8;
 				PC = h|l;
-				return;	
-			
+				return;
+
 			case inst_cpx_imm:
 				t = op1 - X;
 				N = t[7].to_bool();
 				C = (X>=op1);
-				Z = (t==0); 
+				Z = (t==0);
 				return;
-			
+
 			case inst_cpy_imm:
 				t = op1 - Y;
 				N = t[7].to_bool();
 				C = (Y>=op1);
-				Z = (t==0); 
+				Z = (t==0);
 
 			case inst_clc_imp:
 				C = 0 ;
 				return;
-				
+
 			case inst_and_imm:
 				A = A & op1;
 				N = A[7].to_bool();
 				Z = (A==0);
 				return;
-			
+
 			case inst_eor_imm:
 				A = A ^ op1;
 				N = A[7].to_bool();
-				Z = (A==0); 
+				Z = (A==0);
 				return;
-			
+
 			case inst_asl_a:
 				C = A[7].to_bool();
 				A = (A << 1) & 0xFE;
 				N = A[7].to_bool();
 				Z = (A==0);
 				return;
-				
+
 			case inst_asl_abs:
 				M = get((op2<<8) + op1);
 				C = M[7].to_bool();
@@ -261,16 +262,16 @@ struct SorhajoKapitany: public sc_module {
 				N = M[7].to_bool();
 				Z = (M==0);
 				return;
-			
+
 			case inst_rol_a:
 				temp = A[7].to_bool();
 				A = (A << 1) & 0xFE;
 				A = A | C.to_char();
 				C = temp;
 				Z = (A==0);
-				N = A[7].to_bool();    
+				N = A[7].to_bool();
 				return;
-				
+
 			case inst_rol_abs:
 				M = get((op2<<8) + op1);
 				temp = A[7].to_bool();
@@ -278,30 +279,30 @@ struct SorhajoKapitany: public sc_module {
 				M = M | C.to_char();
 				C = temp;
 				Z = (A==0);
-				N = A[7].to_bool(); 
+				N = A[7].to_bool();
 				set((op2<<8) + op1, M);
 				return;
-				
+
 			case inst_bcc_rel:
 				REL = IR.range(15, 8).to_int();
 				if (C == 0)  PC = PC + REL;
 				return;
-				
+
 			case inst_bcs_rel:
 				REL = IR.range(15, 8).to_int();
 				if (C == 0)  PC = PC + REL;
 				return;
-	
+
 			case inst_beq_rel:
 				REL = IR.range(15, 8).to_int();
 				if (Z == 1)  PC = PC + REL;
 				return;
-				
+
 			case inst_bne_rel:
 				REL = IR.range(15, 8).to_int();
 				if (Z == 0)  PC = PC + REL;
 				return;
-				
+
 			case inst_cmp_imm:
 				t = op1 - A;
 				N = t[7].to_bool();
@@ -313,36 +314,36 @@ struct SorhajoKapitany: public sc_module {
 				Z = X==0;
 				N = X[7].to_bool();
 				return;
-			
+
 			case inst_dey_imp:
 				Y--;
 				Z = Y==0;
 				N = Y[7].to_bool();
 				return;
-				
+
 			case inst_inx_imp:
 				X++;
 				Z = X==0;
 				N = X[7].to_bool();
 				return;
-	
+
 			case inst_iny_imp:
 				Y++;
 				Z = Y==0;
 				N = Y[7].to_bool();
 				return;
-	
+
 			case inst_inc_abs:
 				M = get((op2 << 8)+op1) + 1;
 				set((op2 << 8)+op1, M);
 				N = M[7].to_bool();
 				Z = M.to_uint() == 0;
 				return;
-	
+
 			case inst_jmp_abs:
 				PC = (op2 << 8) + op1;
 				return;
-	
+
 			case inst_jsr_abs:
 				PC--;
 				set(SP, PC.range(15,8).to_uint());
@@ -351,71 +352,71 @@ struct SorhajoKapitany: public sc_module {
 				SP--;
 				PC = (op2 << 8) + op1;
 				return;
-	
+
 			case inst_rts_imp:
 				SP++;
 				l = get(SP);
 				SP++;
 				h = get(SP);
-				PC = (h << 8) | l + 1;
+				PC = ((h << 8) | l) + 1;
 				return;
-			
+
 			case inst_lda_imm:
 				A = op1;
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
-	
+
 			case inst_lda_abs:
 				A = get((op2<<8) + op1);;
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
-			
+
 			case inst_lda_abs_x:
 				A = get((op2<<8) + op1 + X.to_uint());
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
-	
+
 			case inst_ldx_imm:
 				X = op1;
 				N = X[7].to_bool();
 				Z = (X.to_uint() == 0);
 				return;
-	
+
 			case inst_ldx_abs:
 				X = get((op2<<8) + op1);
 				N = X[7].to_bool();
 				Z = (X.to_uint() == 0);
 				return;
-	
+
 			case inst_ldy_imm:
 				Y = op1;
 				N = Y[7].to_bool();
 				Z = (Y.to_uint() == 0);
 				return;
-	
+
 			case inst_pla_imp:
 				SP++;
 				A = get(SP.to_uint());
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
-				
+
 			case inst_pha_imp:
 				set(SP, A.to_uint());
 				SP = SP-1;
 				return;
-				
+
 			case inst_sta_abs:
 				set((op2<<8) + op1, A);
 				return;
-			
+
 			case inst_sta_abs_x:
 				set((op2<<8) + op1 + X.to_uint(), A);
 				return;
-			
+
 			case inst_stx_abs:
 				set((op2<<8) + op1, X);
 				return;
@@ -423,25 +424,25 @@ struct SorhajoKapitany: public sc_module {
 			case inst_sty_abs:
 				set((op2<<8) + op1, Y);
 				return;
-			
+
 			case inst_tax_imp:
 				X = A;
 				N = X[7].to_bool();
 				Z = (X.to_uint() == 0);
 				return;
-			
+
 			case inst_tay_imp:
 				Y = A;
 				N = Y[7].to_bool();
 				Z = (Y.to_uint() == 0);
 				return;
-			
+
 			case inst_txa_imp:
 				A = X;
 				N = A[7].to_bool();
 				Z = (A.to_uint() == 0);
 				return;
-			
+
 			case inst_tya_imp:
 				A = Y;
 				N = A[7].to_bool();
@@ -449,10 +450,10 @@ struct SorhajoKapitany: public sc_module {
 				return;
 
 		};
-		
-		
+
+
 	}
-	
+
 	unsigned int getFetchCount(unsigned int op){
 		int i;
 		for(i=0; i<40; i++){
@@ -463,7 +464,7 @@ struct SorhajoKapitany: public sc_module {
 		if(i < 28) return 2;
 		return 3;
 	}
-	
+
   //-----------------------------------------------------------------------------------------------
   // contructor ------------------------
   SC_CTOR(SorhajoKapitany) {

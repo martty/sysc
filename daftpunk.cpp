@@ -10,8 +10,8 @@ struct DaftPunk: public sc_module {
     sc_in<bool> writeneg;
 	sc_in<bool> csneg;
 	sc_inout_rv	< 8 >  Data;
-	
-	sc_uint<8> RAM[0x10000];
+
+	uint8_t RAM[0x10000];
 	// constructor --------------------------------
 	SC_CTOR(DaftPunk){
 		SC_METHOD(FunctionThread);
@@ -24,13 +24,16 @@ struct DaftPunk: public sc_module {
 	// function thread ----------------------------
 	void FunctionThread(){
 		if(csneg.read() == 0){
-			if ( writeneg.read() == 0 ) { 
-				RAM[Address.read().to_uint()] = Data.read(); 
+			if ( writeneg.read() == 0 ) {
+				RAM[Address.read().to_uint()] = Data.read().to_uint();
 			}
-			else if ( readneg.read() == 0 ) { 
-				Data.write( RAM[Address.read().to_uint()] ); 
-			}
-			Data = "ZZZZZZZZ";
+			else if ( readneg.read() == 0 ) {
+			    unsigned long addrin = Address.read().to_uint();
+			    unsigned int dataout = RAM[addrin];
+				Data.write( dataout );
+            } else {
+                Data = "ZZZZZZZZ";
+            }
 		} else {
 			Data = "ZZZZZZZZ";
 		}

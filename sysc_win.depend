@@ -1,0 +1,35 @@
+# depslib dependency file v1.0
+1399237928 source:/home/cpp/sysc_win/syscvideo.cpp
+	<SDL/SDL.h>
+	"syscvideo.h"
+	"437.h"
+
+1399237928 /home/cpp/sysc_win/syscvideo.h
+	<systemc.h>
+	<SDL/SDL.h>
+	<deque>
+
+1399237928 /home/cpp/sysc_win/437.h
+
+1400532838 source:/home/cpp/sysc_win/testbench_shkm.cpp
+	<systemc.h>
+	"matroz.cpp"
+	"daftpunk.cpp"
+	"syscvideo.h"
+	"sorhajokapitanymag.cpp"
+
+1399240399 /home/cpp/sysc_win/matroz.cpp
+	<systemc.h>
+
+1400532177 /home/cpp/sysc_win/daftpunk.cpp
+	<systemc.h>
+
+1400533004 /home/cpp/sysc_win/sorhajokapitanymag.cpp
+	<systemc.h>
+	<cstdio>
+	<cstdlib>
+	<iostream>
+	<iomanip>
+	<set>
+	<map>
+
