@@ -473,7 +473,7 @@ struct SorhajoKapitany: public sc_module {
     P = 0;
 	A = X = Y = 0;
 	SP = 0x01FF;
-	log = std::ofstream("decoded.log");
+	log.open("decoded.log");
   }
 
 };
