@@ -17,7 +17,7 @@ struct DaftPunk: public sc_module {
 		SC_METHOD(FunctionThread);
 		sensitive << readneg << writeneg;
 		// Program memory initialization --
-		for (unsigned int i = 0; i < 0x1000; i++){
+		for (unsigned int i = 0; i < 0x10000; i++){
 			RAM[i] = 0;
 		}
 	}

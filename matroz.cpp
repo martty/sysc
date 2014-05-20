@@ -10,9 +10,9 @@ struct ClockGenerator : public sc_module{
   void FunctionThread() {
     while (1) {
       ClkOut.write(false);
-      wait(100,SC_NS);
+      wait(1000,SC_NS);
       ClkOut.write(true);
-      wait(100,SC_NS);
+      wait(1000,SC_NS);
     }
   }
 };
@@ -20,8 +20,8 @@ struct ClockGenerator : public sc_module{
 struct CSneg_Daft : public sc_module{
 	sc_in	< sc_lv<16> > Address;
 	sc_out  < bool >  csneg;
-	SC_CTOR(CSneg_Daft) { 
-		SC_METHOD(CS); 
+	SC_CTOR(CSneg_Daft) {
+		SC_METHOD(CS);
 		dont_initialize();
 		sensitive << Address;
 	}
@@ -37,9 +37,9 @@ struct CSneg_SysCVideo : public sc_module{
 	sc_in	< sc_lv<16> > Address;
 	sc_out  < bool >  csneg;
 	sc_out 	< sc_lv<12> > Address_low;
-	
-	SC_CTOR(CSneg_SysCVideo) { 
-		SC_METHOD(CS); 
+
+	SC_CTOR(CSneg_SysCVideo) {
+		SC_METHOD(CS);
 		dont_initialize();
 		sensitive << Address;
 	}

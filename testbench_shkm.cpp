@@ -8,7 +8,7 @@ DaftPunk	DAFT("DAFT");
 SorhajoKapitany SYSTEM("SYSTEM");
 //-------------------------------------------------------------------------------------------------
 int sc_main(int argc, char* argv[]){
-	sc_set_time_resolution(1,SC_NS);
+	sc_set_time_resolution(10,SC_NS);
 
 
 	// component instantiations -------------------
@@ -59,7 +59,7 @@ int sc_main(int argc, char* argv[]){
 
 	std::cout << "Sorhajokapitanymag v1" << std::endl;
 
-
+/*
   sc_trace_file *tf;
   tf = sc_create_vcd_trace_file("trace");
   sc_trace(tf,SYSTEM.Reset,"Reset");
@@ -69,7 +69,7 @@ int sc_main(int argc, char* argv[]){
   sc_trace(tf,SYSTEM.Data,"Data");
   sc_trace(tf,SYSTEM.Address,"Address");
   sc_trace(tf,DAFT.csneg,"CSNEG_DAFT");
-  sc_trace(tf,gk.csneg,"CSNEG_SysCVideo");
+  sc_trace(tf,gk.csneg,"CSNEG_SysCVideo");*/
 
 
 
@@ -98,14 +98,16 @@ int sc_main(int argc, char* argv[]){
 	}
 
 	for(int i = 0; ; i++){
-		sc_start(1,SC_NS);
+		sc_start(20, SC_NS);
+		//SDL_Delay(20);
 		if(Abort.read() == "1"){
 			break;
 		}
 	}
-
+    std::cin.get();
   std::cout << "Execution finished." << std::endl;
-   sc_close_vcd_trace_file(tf);
+   //sc_close_vcd_trace_file(tf);
+   SYSTEM.log.close();
 	//---------------------------------------------
   return 0;
 }

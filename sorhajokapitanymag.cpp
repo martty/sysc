@@ -66,6 +66,13 @@ unsigned int inst_type[42]={ inst_brk_imp, inst_clc_imp, inst_dex_imp, inst_dey_
 					inst_sty_abs,
 					inst_lda_abs_x, inst_sta_abs_x
 					};
+static const char * const inst_name[] = {"BRK", "CLC", "DEX", "DEY", "INX", "INY", "PLA", "PHA", "RTS", "TAX", "TAY", "TXA", "TYA",
+                    "ASL", "ROL",
+                    "ADC", "AND", "CMP", "CPX", "CPY", "EOR", "LDA", "LDX", "LDY",
+                    "BCC", "BEQ", "BNE", "BCS",
+                    "ADC", "ASL", "INC", "JMP", "JSR", "LDA", "LDX", "ROL", "STA", "STX", "STY",
+                    "LDA", "STA"
+                    };
 //	0-14: 1
 //	15-27: 2
 //	28-40: 3
@@ -85,6 +92,7 @@ struct SorhajoKapitany: public sc_module {
   sc_out	< sc_lv<1> >	Abort;
   // internal resources ----------------
   sc_uint<16>	PC;     // instruction pointer
+  uint16_t      PC_shadow;
   sc_lv<8>      P;		// zero flag
   sc_lv<24>		IR;		// intermediate register
 
@@ -103,12 +111,14 @@ struct SorhajoKapitany: public sc_module {
 				IR = 0;
 			} else {
 				IR = 0;
+				PC_shadow = PC.to_uint();
 				current_fetch = 1;
 				do {
 					Fetch();
 				} while (Decode());
 				PC++;
 				Execute();
+				log << std::endl;
 			}
 			wait();
 		}
@@ -123,7 +133,7 @@ struct SorhajoKapitany: public sc_module {
 		if (getFetchCount(IR.range(7,0).to_uint()) > current_fetch){
 			PC++;
 			current_fetch++;
-			wait();
+			//wait();
 			return true;
 		} else {
 			return false;
@@ -138,6 +148,7 @@ struct SorhajoKapitany: public sc_module {
 		readneg.write(0);
 		wait();
 		unsigned int rd  = (Data.read().to_uint());
+		//log << "|READ " << std::hex << std::setw(2) << rd << " <- " << std::setw(2) << addr;
 		readneg.write(1);
 		writeneg.write(1);
 		wait();
@@ -148,26 +159,34 @@ struct SorhajoKapitany: public sc_module {
 		readneg.write(1);
 		writeneg.write(1);
 		Address.write(addr);
-		wait();
+		//wait();
 		Data.write(value);
 		wait();
 		writeneg.write(0);
 		wait();
 		readneg.write(1);
 		writeneg.write(1);
+		log << "|WRITE " << std::hex << std::setw(2) << value << " -> " << std::setw(4) << addr;
 		Data = "ZZZZZZZZ";
-		wait();
+		//wait();
 	}
 
 	void Execute() {
 		//std::cerr << "Executing " << std::hex << IR.range((current_fetch-1)*8+7, 0).to_uint() << "@" << PC.to_uint() << std::endl;
+
 		unsigned int opcode = IR.range(7, 0).to_uint();
 		unsigned int op1 = IR.range(15, 8).to_uint();
 		unsigned int op2 = IR.range(23, 16).to_uint();
-		log << std::hex << "(" << PC.to_uint() - current_fetch << ")" << std::setw(2) << opcode << " " <<  std::setw(2) << op1 << " " << std::setw(2) << op2 << "|P: " << std::setw(2) << P.to_uint() << "|PC:" << PC.to_uint() << std::endl;
-		log.flush();
+		const char * instname = getInstructionName(opcode);
 
-		sc_uint<8> M, t, l, h;
+/*		log << std::hex << "(" << PC.to_uint() - current_fetch << ")" <<  instname << " "
+		<<  std::setw(2) << op1 << " " << std::setw(2) << op2 << "|P N " << N << " V" << V << " D" << D << " Z" << Z << " C" << C <<
+		"|A: " << std::setw(2) << A.to_uint() << "|X: " << std::setw(2) << X.to_uint() << "|Y: " << std::setw(2) << Y.to_uint()
+		<< "|PC:" << PC.to_uint();*/
+//		log.flush();
+
+		sc_uint<8> M, l, h;
+		sc_uint<16> t;
 		int REL;
 
 		bool temp;
@@ -181,33 +200,36 @@ struct SorhajoKapitany: public sc_module {
 				N =  A[7].to_bool();
 				Z = (t==0);
 				if (D.to_bool()){
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_char();
+				    t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0);
+				    if(C.to_bool())
+                        t += 1;
 					C = (t>99);
-					}
-				else{
+                } else {
 					C = (t>255);
 					A = t & 0xFF  ;
-					}
+                }
 				return;
 
 			case inst_adc_imm:
-				M = get((PC.range(15,0)<<8) + op1);
+				//M = get((PC.range(15,0)<<8) + op1);
+                M = op1;
 				t = C.to_bool() ? A + M + 1 :  A + M ;
 				V = (A[7]!=t[7]);
 				N =  A[7].to_bool();
 				Z = (t==0);
 				if (D.to_bool()){
-					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0) + C.to_char();
+					t = 10*(A.range(7,4).to_uint() + M.range(7,4)) + A.range(3,0).to_uint() + M.range(3,0);
+					if(C.to_bool())
+                        t+=1;
 					C = (t>99);
-					}
-				else{
+                } else {
 					C = (t>255);
-					A = t & 0xFF  ;
-					}
+                }
+                A = t & 0xFF;
 				return;
 
 			case inst_brk_imp:
-				PC = PC + 1;
+				/*PC = PC + 1;
 				set(SP, PC.range(15,8));
 				SP = SP - 1;
 				set(SP, PC.range(7,0));
@@ -216,7 +238,9 @@ struct SorhajoKapitany: public sc_module {
 				SP = SP - 1;
 				l = get(0xFFFE);
 				h = get(0xFFFF)<<8;
-				PC = h|l;
+				PC = h|l;*/
+                Abort.write(1);
+                sc_stop();
 				return;
 
 			case inst_cpx_imm:
@@ -261,12 +285,14 @@ struct SorhajoKapitany: public sc_module {
 				M = (M << 1) & 0xFE;
 				N = M[7].to_bool();
 				Z = (M==0);
+				set((op2<<8) + op1, M);
 				return;
 
 			case inst_rol_a:
 				temp = A[7].to_bool();
 				A = (A << 1) & 0xFE;
-				A = A | C.to_char();
+				if(C.to_bool())
+                    A = A | 0x1;
 				C = temp;
 				Z = (A==0);
 				N = A[7].to_bool();
@@ -274,9 +300,10 @@ struct SorhajoKapitany: public sc_module {
 
 			case inst_rol_abs:
 				M = get((op2<<8) + op1);
-				temp = A[7].to_bool();
+				temp = M[7].to_bool();
 				M = (M << 1) & 0xFE;
-				M = M | C.to_char();
+				if(C.to_bool())
+                    M = M | 0x1;
 				C = temp;
 				Z = (A==0);
 				N = A[7].to_bool();
@@ -285,29 +312,30 @@ struct SorhajoKapitany: public sc_module {
 
 			case inst_bcc_rel:
 				REL = IR.range(15, 8).to_int();
-				if (C == 0)  PC = PC + REL;
+				if (C.to_bool() == 0)  PC = PC + REL;
 				return;
 
 			case inst_bcs_rel:
 				REL = IR.range(15, 8).to_int();
-				if (C == 0)  PC = PC + REL;
+				if (C.to_bool() == 1)  PC = PC + REL;
 				return;
 
 			case inst_beq_rel:
 				REL = IR.range(15, 8).to_int();
-				if (Z == 1)  PC = PC + REL;
+				if (Z.to_bool() == 1)  PC = PC + REL;
 				return;
 
 			case inst_bne_rel:
 				REL = IR.range(15, 8).to_int();
-				if (Z == 0)  PC = PC + REL;
+				if (Z.to_bool() == 0)  PC = PC + REL;
 				return;
 
 			case inst_cmp_imm:
 				t = op1 - A;
 				N = t[7].to_bool();
-				C = (A>=M);
+				C = (A>=op1);
 				Z = (t==0);
+				return;
 
 			case inst_dex_imp:
 				X--;
@@ -454,9 +482,16 @@ struct SorhajoKapitany: public sc_module {
 
 	}
 
+	const char * getInstructionName(unsigned int op){
+	    for(int i=0; i<42; i++){
+			if(op == inst_type[i])
+				return inst_name[i];
+		}
+	}
+
 	unsigned int getFetchCount(unsigned int op){
 		int i;
-		for(i=0; i<40; i++){
+		for(i=0; i<42; i++){
 			if(op == inst_type[i])
 				break;
 		}

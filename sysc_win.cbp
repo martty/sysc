@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="kukacsysc.bin 0xc000" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>
@@ -32,7 +33,21 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Linker>
+			<Add option="`sdl-config --libs`" />
+			<Add library="systemc" />
+		</Linker>
+		<Unit filename="daftpunk.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="matroz.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="sorhajokapitanymag.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="syscvideo.cpp" />
+		<Unit filename="testbench_shkm.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
