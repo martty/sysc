@@ -98,7 +98,7 @@ struct SorhajoKapitany: public sc_module {
 
   sc_uint<8>		A, X, Y, SP;
   unsigned current_fetch;
-  std::ofstream log;
+  //std::ofstream log;
 
 
   //-----------------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ struct SorhajoKapitany: public sc_module {
 				} while (Decode());
 				PC++;
 				Execute();
-				log << std::endl;
+//				log << std::endl;
 			}
 			wait();
 		}
@@ -133,7 +133,6 @@ struct SorhajoKapitany: public sc_module {
 		if (getFetchCount(IR.range(7,0).to_uint()) > current_fetch){
 			PC++;
 			current_fetch++;
-			//wait();
 			return true;
 		} else {
 			return false;
@@ -151,7 +150,7 @@ struct SorhajoKapitany: public sc_module {
 		//log << "|READ " << std::hex << std::setw(2) << rd << " <- " << std::setw(2) << addr;
 		readneg.write(1);
 		writeneg.write(1);
-		wait();
+		//wait();
 		return rd;
 	}
 
@@ -166,7 +165,7 @@ struct SorhajoKapitany: public sc_module {
 		wait();
 		readneg.write(1);
 		writeneg.write(1);
-		log << "|WRITE " << std::hex << std::setw(2) << value << " -> " << std::setw(4) << addr;
+		//log << "|WRITE " << std::hex << std::setw(2) << value << " -> " << std::setw(4) << addr;
 		Data = "ZZZZZZZZ";
 		//wait();
 	}
@@ -509,7 +508,7 @@ struct SorhajoKapitany: public sc_module {
     P = 0;
 	A = X = Y = 0;
 	SP = 0x01FF;
-	log.open("decoded.log");
+	//log.open("decoded.log");
   }
 
 };

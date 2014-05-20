@@ -10,9 +10,9 @@ struct ClockGenerator : public sc_module{
   void FunctionThread() {
     while (1) {
       ClkOut.write(false);
-      wait(1000,SC_NS);
+      wait(50,SC_NS);
       ClkOut.write(true);
-      wait(1000,SC_NS);
+      wait(50,SC_NS);
     }
   }
 };

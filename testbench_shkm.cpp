@@ -96,18 +96,11 @@ int sc_main(int argc, char* argv[]){
 		}*/
 		fclose(f);
 	}
-
-	for(int i = 0; ; i++){
-		sc_start(20, SC_NS);
-		//SDL_Delay(20);
-		if(Abort.read() == "1"){
-			break;
-		}
-	}
-    std::cin.get();
-  std::cout << "Execution finished." << std::endl;
+    sc_start();
+    //std::cin.get();
+    std::cout << "Execution finished." << std::endl;
    //sc_close_vcd_trace_file(tf);
-   SYSTEM.log.close();
+   //SYSTEM.log.close();
 	//---------------------------------------------
   return 0;
 }

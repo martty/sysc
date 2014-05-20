@@ -223,7 +223,7 @@ void SysCVideo::utemez()
 {
     data = "ZZZZZZZZ";
     while (true) {
-        wait(20, SC_MS);
+        wait(500, SC_US);
         rajzol();
     }
 }
