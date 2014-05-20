@@ -1,1 +1,4 @@
 *.cppPreview
+bin/
+obj/
+*.depend
